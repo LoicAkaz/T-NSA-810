@@ -1,4 +1,4 @@
-# CIA - Deployment and Securing of a Hybrid Infrastructure [cite: 3]
+# CIA - Deployment and Securing of a Hybrid Infrastructure
 
 ## 📝 Description du Projet
 Ce projet consiste à concevoir, déployer et sécuriser une infrastructure hybride composée de deux sites **Proxmox VE** (un site local et un site distant).L'objectif est de créer une architecture évolutive, hautement disponible et entièrement automatisée via une approche **GitOps** utilisant **ansible-pull** et la **Stack Elastic** pour l'observabilité.
