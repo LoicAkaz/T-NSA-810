@@ -22,7 +22,7 @@ jobs:
             - name: Setup Terraform
               uses: hashicorp/setup-terraform@v3
               with:
-                terraform_version: 1.14.5
+                  terraform_version: 1.14.5
 
             - name: Terraform Fmt
               run: terraform fmt -check -recursive
@@ -41,5 +41,32 @@ jobs:
 
             - name: Run TFSec (Security)
               uses: aquasecurity/tfsec-action@v1.0.3
-              with: 
-                working_directory: infra
+              with:
+                  working_directory: infra
+
+    ansible:
+        name: Ansible Checks
+        runs-on: ubuntu-latest
+
+        defaults:
+            run:
+                working-directory: ansible
+
+        steps:
+            - name: Checkout Repository
+              uses: actions/checkout@v4
+
+            - name: Setup Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.11"
+
+            - name: Install Ansible and Lint Tools
+              run: |
+                  pip install ansible ansible-lint yamllint
+
+            - name: Run YAML Lint
+              run: yamllint .
+
+            - name: Run Ansible Lint
+              run: ansible-lint .
