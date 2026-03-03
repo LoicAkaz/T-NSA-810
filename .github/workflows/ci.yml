@@ -1,1 +1,21 @@
-name: CI pipeline
+name: CI - Iac Validation
+
+on:
+    push: 
+        branches: [main]
+    pull_request:
+        branches: [main]
+
+jobs:
+    
+    terraform:
+        name: Terraform Check
+        runs-on: ubuntu-latest
+
+        defaults:
+          run:
+            working-directory: infra
+        
+        steps:
+            - name: Checkout Repository
+              uses: actions/checkout@v4
