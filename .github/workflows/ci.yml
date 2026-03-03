@@ -1,21 +1,40 @@
 name: CI - Iac Validation
 
 on:
-    push: 
+    push:
         branches: [main]
     pull_request:
         branches: [main]
 
 jobs:
-    
     terraform:
         name: Terraform Check
         runs-on: ubuntu-latest
 
         defaults:
-          run:
-            working-directory: infra
-        
+            run:
+                working-directory: infra
+
         steps:
             - name: Checkout Repository
               uses: actions/checkout@v4
+
+            - name: Setup Terraform
+              run: terraform ftm -check -recursive
+
+            - name: Terraform Init
+              run: terraform init -backkend=false
+
+            - name: Terraform Validate
+              run: terraform validate
+
+            - name: Install TFLint
+              run: curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+
+            - name: Run TFLint
+              run: tflint --recursive
+
+            - name: Run TFSec (Security)
+              uses: aquasecurity/tfsec-action@v1.0.3
+              with: 
+                working_directory: infra
