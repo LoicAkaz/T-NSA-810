@@ -1,38 +1,52 @@
 # CIA - Deployment and Securing of a Hybrid Infrastructure
 
-## 📝 Description du Projet
-Ce projet consiste à concevoir, déployer et sécuriser une infrastructure hybride composée de deux sites **Proxmox VE** (un site local et un site distant).L'objectif est de créer une architecture évolutive, hautement disponible et entièrement automatisée via une approche **GitOps** utilisant **ansible-pull** et la **Stack Elastic** pour l'observabilité.
+## Project Description
 
-## 🎯 Objectifs Principaux
-* **Hybridation** : Déploiement de deux sites Proxmox interconnectés.
-* **Sécurité Réseau** : Mise en place d'un VPN site-à-site sécurisé et de firewalls pfSense avec capacité de coupure d'urgence (*kill switch*).
-* **Accès Contrôlé** : Installation d'un bastion pour l'accès externe au site distant.
-* **Gestion IPAM** : Automatisation de la gestion des adresses IP via **NetBox**.
-* **Observabilité** : Centralisation et analyse des logs avec la **Stack Elastic** complète.
-* **Segmentation** : Séparation stricte des trafics (Admin / Users / Services) et respect du principe du moindre privilège.
+This project designs, deploys, and secures a hybrid infrastructure across two Proxmox VE sites (one local and one remote).
+The goal is to build an evolutive, highly available, and automated platform using a GitOps approach with `ansible-pull` and the Elastic Stack for observability.
 
-## 🛠️ Stack Technique
-| Composant | Technologie | Description |
+## Main Objectives
+
+- Hybrid architecture with two interconnected Proxmox sites
+- Secure site-to-site VPN and pfSense firewalls with kill switch capability
+- Controlled external access through a bastion host
+- Automated IPAM with NetBox
+- Centralized observability with the Elastic Stack
+- Strong traffic segmentation (Admin / Users / Services) and least privilege
+
+## Technical Stack
+
+| Component | Technology | Description |
 | :--- | :--- | :--- |
-| **Virtualisation** | **Proxmox VE** | Solution bare-metal pour l'hébergement des VMs. |
-| **Firewall / Routage**| **pfSense** | Filtrage du trafic et réduction de l'exposition. |
-| **VPN** | **OpenVPN** | Interconnexion chiffrée site-à-site. |
-| **Configuration** | **Ansible (Pull)** | Gestion de configuration continue et automatisée via Git. |
-| **IPAM** | **NetBox** | Source de vérité pour la gestion réseau. |
-| **Observabilité** | **Stack Elastic** | Analyse des logs et monitoring de l'infrastructure. |
+| Virtualization | Proxmox VE | Bare-metal virtualization platform |
+| Firewall / Routing | pfSense | Network filtering and reduced exposure |
+| VPN | OpenVPN | Encrypted site-to-site interconnection |
+| Configuration | Ansible (Pull) | Continuous configuration management from Git |
+| IPAM | NetBox | Source of truth for network addressing |
+| Observability | Elastic Stack | Log collection, analysis, and monitoring |
 
-## ⚠️ Contraintes Techniques
-* **Limitation des ressources** : Un maximum de **3 VMs** par site Proxmox est autorisé.
-* **Disponibilité DNS** : Transfert DNS opérationnel entre les deux sites.
-* **Documentation** : Rédaction de **runbooks** détaillés pour la reconstruction complète de l'infrastructure.
-* **Support** : Utilisation exclusive de stacks activement maintenues par la communauté.
+## Repository Structure
 
-## 📂 Structure du Dépôt
-* `ansible/` : Playbooks et rôles pour le déploiement via **ansible-pull**.
-* `pfsense/` : Configurations et règles de filtrage réseau.
-* `elastic/` : Pipelines de logs et configurations Kibana.
-* `netbox/` : Scripts d'automatisation pour l'IPAM.
-* `docs/` : Diagrammes d'architecture et procédures de reprise d'activité (DRP).
+- `infra/`: Terraform infrastructure code
+- `ansible/`: Playbooks and roles for configuration management
+- `README.md`: Project overview
+
+## CI Overview
+
+The GitHub Actions pipeline validates infrastructure code before merge:
+
+- Terraform setup (`hashicorp/setup-terraform@v3`)
+- `terraform fmt -check -recursive`
+- `terraform init -backend=false`
+- `terraform validate`
+- `tflint --recursive`
+- `tfsec` security scan
+- Ansible lint checks (`yamllint`, `ansible-lint`)
+
+## Notes
+
+- Terraform CLI version is pinned in CI and must stay consistent with `infra/modules/terraform.tf`.
+- The Terraform module must define `required_version` to satisfy TFLint (`terraform_required_version`).
 
 ---
-*Ce projet est réalisé dans le cadre du cursus {EPITECH}.*
+Project developed as part of the EPITECH curriculum.
