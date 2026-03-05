@@ -7,14 +7,14 @@ on:
       - "infra/**"
       - "ansible/**"
       - ".github/workflows/ci.yml"
-      - ".github/ci-versions.env"
+      - ".github/workflows/ci-versions.env"
   pull_request:
     branches: [main]
     paths:
       - "infra/**"
       - "ansible/**"
       - ".github/workflows/ci.yml"
-      - ".github/ci-versions.env"
+      - ".github/workflows/ci-versions.env"
 
 jobs:
   changes:
@@ -30,10 +30,10 @@ jobs:
           filters: |
             infra:
               - 'infra/**'
-              - '.github/ci-versions.env'
+              - '.github/workflows/ci-versions.env'
             ansible:
               - 'ansible/**'
-              - '.github/ci-versions.env'
+              - '.github/workflows/ci-versions.env'
   versions:
     name: Load CI Versions
     runs-on: ubuntu-latest
@@ -54,9 +54,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          source .github/ci-versions.env
+          source .github/workflows/ci-versions.env
           {
-            echo "terraform_version=${TERRAFORM_VEERSION}"
+            echo "terraform_version=${TERRAFORM_VERSION}"
             echo "tflint_version=${TFLINT_VERSION}"
             echo "tfsec_version=${TFSEC_VERSION}"
             echo "python_version=${PYTHON_VERSION}"
@@ -104,7 +104,13 @@ jobs:
         shell: bash
         env:
           TFSEC_VERSION: ${{needs.versions.outputs.tfsec_version}}
-        run: curl -s https://raw.githubusercontent.com/aquasecurity/tfsec/master/scripts/install_linux.sh | bash -s -- "${TFSEC_VERSION}"
+        run: |
+          set -euo pipefail
+          mkdir -p "${HOME}/.local/bin"
+          curl -sSfL "https://github.com/aquasecurity/tfsec/releases/download/${TFSEC_VERSION}/tfsec-linux-amd64" -o "${HOME}/.local/bin/tfsec"
+          chmod +x "${HOME}/.local/bin/tfsec"
+          echo "${HOME}/.local/bin" >> "$GITHUB_PATH"
+          tfsec --version
 
       - name: Run TFSec (Security)
         run: tfsec .
@@ -136,8 +142,8 @@ jobs:
           YAMLLINT_VERSION: ${{needs.versions.outputs.yamllint_version}}
         run: |
           pip install \
-            "ansible==${ANSIBLE_VERSION}"\
-            "ansible-lint==${ANSIBLE_LINT_VERSION}"\
+            "ansible==${ANSIBLE_VERSION}" \
+            "ansible-lint==${ANSIBLE_LINT_VERSION}" \
             "yamllint==${YAMLLINT_VERSION}"
 
       - name: Run YAML Lint
