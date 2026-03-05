@@ -19,8 +19,11 @@ This directory contains Terraform code used to provision:
 
 ## Prerequisites
 
-- Terraform `1.14.5` (aligned with CI)
-- TFLint (for linting checks)
+- Versions are centralized in `.github/workflows/ci-versions.env`:
+  - `TERRAFORM_VERSION`
+  - `TFLINT_VERSION`
+  - `TFSEC_VERSION`
+- `modules/terraform.tf` must keep `required_version` aligned with `TERRAFORM_VERSION`.
 
 ## Local Usage
 
@@ -31,6 +34,7 @@ terraform fmt -check -recursive
 terraform init -backend=false
 terraform validate
 tflint --recursive
+tfsec .
 ```
 
 ## CI Checks
@@ -42,11 +46,17 @@ The Terraform job in `.github/workflows/ci.yml` runs:
 - `terraform init -backend=false`
 - `terraform validate`
 - `tflint --recursive`
-- `tfsec`
+- `tfsec .`
+
+CI behavior:
+
+- Workflow is triggered only when `infra/**`, `ansible/**`, or CI workflow/version files change.
+- A `changes` job decides whether Terraform checks need to run.
+- A `versions` job loads tool versions from `.github/workflows/ci-versions.env`.
 
 ## TFLint Requirement
 
-To avoid the `terraform_required_version` warning/error, keep this in `modules/terraform.tf`:
+To avoid the `terraform_required_version` warning/error, keep this in `modules/terraform.tf` and keep it synchronized with CI versions:
 
 ```hcl
 terraform {
