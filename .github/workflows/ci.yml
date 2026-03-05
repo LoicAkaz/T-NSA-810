@@ -7,12 +7,14 @@ on:
       - "infra/**"
       - "ansible/**"
       - ".github/workflows/ci.yml"
+      - ".github/ci-versions.env"
   pull_request:
     branches: [main]
     paths:
       - "infra/**"
       - "ansible/**"
       - ".github/workflows/ci.yml"
+      - ".github/ci-versions.env"
 
 jobs:
   changes:
@@ -28,10 +30,42 @@ jobs:
           filters: |
             infra:
               - 'infra/**'
+              - '.github/ci-versions.env'
             ansible:
               - 'ansible/**'
+              - '.github/ci-versions.env'
+  versions:
+    name: Load CI Versions
+    runs-on: ubuntu-latest
+    outputs:
+      terraform_version: ${{steps.versions.outputs.terraform_version}}
+      tflint_version: ${{ steps.versions.outputs.tflint_version }}
+      tfsec_version: ${{ steps.versions.outputs.tfsec_version }}
+      python_version: ${{ steps.versions.outputs.python_version }}
+      ansible_version: ${{ steps.versions.outputs.ansible_version }}
+      ansible_lint_version: ${{ steps.versions.outputs.ansible_lint_version }}
+      yamllint_version: ${{ steps.versions.outputs.yamllint_version }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Read Versions File
+        id: versions
+        shell: bash
+        run: |
+          set -euo pipefail
+          source .github/ci-versions.env
+          {
+            echo "terraform_version=${TERRAFORM_VEERSION}"
+            echo "tflint_version=${TFLINT_VERSION}"
+            echo "tfsec_version=${TFSEC_VERSION}"
+            echo "python_version=${PYTHON_VERSION}"
+            echo "ansible_version=${ANSIBLE_VERSION}"
+            echo "ansible_lint_version=${ANSIBLE_LINT_VERSION}"
+            echo "yamllint_version=${YAMLLINT_VERSION}"
+          } >> "$GITHUB_OUTPUT"
   terraform:
-    needs: changes
+    needs: [changes, versions]
     if: ${{needs.changes.outputs.infra == 'true'}}
     name: Terraform Check
     runs-on: ubuntu-latest
@@ -47,7 +81,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.14.5
+          terraform_version: ${{needs.versions.outputs.terraform_version}}
 
       - name: Terraform Fmt
         run: terraform fmt -check -recursive
@@ -58,19 +92,25 @@ jobs:
       - name: Terraform Validate
         run: terraform validate
 
-      - name: Install TFLint
-        run: curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+      - name: Setup TFLint
+        uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: ${{needs.versions.outputs.tflint_version}}
 
       - name: Run TFLint
         run: tflint --recursive
 
+      - name: Install tfsec
+        shell: bash
+        env:
+          TFSEC_VERSION: ${{needs.versions.outputs.tfsec_version}}
+        run: curl -s https://raw.githubusercontent.com/aquasecurity/tfsec/master/scripts/install_linux.sh | bash -s -- "${TFSEC_VERSION}"
+
       - name: Run TFSec (Security)
-        uses: aquasecurity/tfsec-action@v1.0.3
-        with:
-          working_directory: infra
+        run: tfsec .
 
   ansible:
-    needs: changes
+    needs: [changes, versions]
     if: ${{needs.changes.outputs.ansible == 'true'}}
     name: Ansible Checks
     runs-on: ubuntu-latest
@@ -86,11 +126,19 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: ${{needs.versions.outputs.python_version}}
 
       - name: Install Ansible and Lint Tools
+        shell: bash
+        env:
+          ANSIBLE_VERSION: ${{needs.versions.outputs.ansible_version}}
+          ANSIBLE_LINT_VERSION: ${{needs.versions.outputs.ansible_lint_version}}
+          YAMLLINT_VERSION: ${{needs.versions.outputs.yamllint_version}}
         run: |
-          pip install ansible ansible-lint yamllint
+          pip install \
+            "ansible==${ANSIBLE_VERSION}"\
+            "ansible-lint==${ANSIBLE_LINT_VERSION}"\
+            "yamllint==${YAMLLINT_VERSION}"
 
       - name: Run YAML Lint
         run: yamllint .
