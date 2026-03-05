@@ -146,6 +146,12 @@ jobs:
             "ansible-lint==${ANSIBLE_LINT_VERSION}" \
             "yamllint==${YAMLLINT_VERSION}"
 
+      - name: Run Ansible Syntax Check
+        run: |
+          ansible-playbook --syntax-check playbooks/site.yml
+          ansible-playbook --syntax-check -i inventory/local.yml playbooks/local.yml
+          ansible-playbook --syntax-check -i inventory/onprem.yml playbooks/onprem.yml
+
       - name: Run YAML Lint
         run: yamllint .
 
