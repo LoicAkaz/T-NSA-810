@@ -33,7 +33,22 @@ The goal is to build an evolutive, highly available, and automated platform usin
 
 ## CI Overview
 
-The GitHub Actions pipeline validates infrastructure code before merge:
+The GitHub Actions pipeline validates infrastructure and configuration code before merge.
+
+Workflow file:
+
+- `.github/workflows/ci.yml`
+
+Version source file:
+
+- `.github/workflows/ci-versions.env`
+
+Execution flow:
+
+- `changes` job: detects whether `infra/**` or `ansible/**` changed
+- `versions` job: loads pinned versions from `ci-versions.env`
+- `terraform` job: runs only when Infra scope changed
+- `ansible` job: runs only when Ansible scope changed
 
 - Terraform setup (`hashicorp/setup-terraform@v3`)
 - `terraform fmt -check -recursive`
@@ -45,7 +60,8 @@ The GitHub Actions pipeline validates infrastructure code before merge:
 
 ## Notes
 
-- Terraform CLI version is pinned in CI and must stay consistent with `infra/modules/terraform.tf`.
+- Tool versions are centralized in `.github/workflows/ci-versions.env`.
+- Terraform CLI version in CI must stay consistent with `infra/modules/terraform.tf`.
 - The Terraform module must define `required_version` to satisfy TFLint (`terraform_required_version`).
 
 ---
