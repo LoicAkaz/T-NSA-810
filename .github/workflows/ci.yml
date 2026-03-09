@@ -7,14 +7,12 @@ on:
       - "infra/**"
       - "ansible/**"
       - ".github/workflows/ci.yml"
-      - ".github/workflows/ci-versions.env"
   pull_request:
     branches: [main]
     paths:
       - "infra/**"
       - "ansible/**"
       - ".github/workflows/ci.yml"
-      - ".github/workflows/ci-versions.env"
 
 jobs:
   changes:
@@ -30,21 +28,19 @@ jobs:
           filters: |
             infra:
               - 'infra/**'
-              - '.github/workflows/ci-versions.env'
             ansible:
               - 'ansible/**'
-              - '.github/workflows/ci-versions.env'
   versions:
     name: Load CI Versions
     runs-on: ubuntu-latest
     outputs:
-      terraform_version: ${{steps.versions.outputs.terraform_version}}
-      tflint_version: ${{ steps.versions.outputs.tflint_version }}
-      tfsec_version: ${{ steps.versions.outputs.tfsec_version }}
-      python_version: ${{ steps.versions.outputs.python_version }}
-      ansible_version: ${{ steps.versions.outputs.ansible_version }}
-      ansible_lint_version: ${{ steps.versions.outputs.ansible_lint_version }}
-      yamllint_version: ${{ steps.versions.outputs.yamllint_version }}
+      terraform_version: ${{vars.TERRAFORM_VERSION}}
+      tflint_version: ${{ vars.TFLINT_VERSION }}
+      tfsec_version: ${{ vars.TFSEC_VERSION }}
+      python_version: ${{ vars.PYTHON_VERSION }}
+      ansible_version: ${{ vars.ANSIBLE_VERSION }}
+      ansible_lint_version: ${{ vars.ANSIBLE_LINT_VERSION }}
+      yamllint_version: ${{ vars.YAMLLINT_VERSION}}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -81,7 +77,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: ${{needs.versions.outputs.terraform_version}}
+          terraform_version: ${{vars.TERRAFORM_VERSION}}
 
       - name: Terraform Fmt
         run: terraform fmt -check -recursive
@@ -95,7 +91,7 @@ jobs:
       - name: Setup TFLint
         uses: terraform-linters/setup-tflint@v4
         with:
-          tflint_version: ${{needs.versions.outputs.tflint_version}}
+          tflint_version: ${{vars.TFLINT_VERSION}}
 
       - name: Run TFLint
         run: tflint --recursive
@@ -103,7 +99,7 @@ jobs:
       - name: Install tfsec
         shell: bash
         env:
-          TFSEC_VERSION: ${{needs.versions.outputs.tfsec_version}}
+          TFSEC_VERSION: ${{vars.TFSEC_VERSION}}
         run: |
           set -euo pipefail
           mkdir -p "${HOME}/.local/bin"
@@ -132,14 +128,14 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{needs.versions.outputs.python_version}}
+          python-version: ${{vars.PYTHON_VERSION}}
 
       - name: Install Ansible and Lint Tools
         shell: bash
         env:
-          ANSIBLE_VERSION: ${{needs.versions.outputs.ansible_version}}
-          ANSIBLE_LINT_VERSION: ${{needs.versions.outputs.ansible_lint_version}}
-          YAMLLINT_VERSION: ${{needs.versions.outputs.yamllint_version}}
+          ANSIBLE_VERSION: ${{vars.ANSIBLE_VERSION}}
+          ANSIBLE_LINT_VERSION: ${{vars.ANSIBLE_LINT_VERSION}}
+          YAMLLINT_VERSION: ${{vars.YAMLLINT_VERSION}}
         run: |
           pip install \
             "ansible==${ANSIBLE_VERSION}" \
