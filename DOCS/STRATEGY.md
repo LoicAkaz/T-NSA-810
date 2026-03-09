@@ -13,8 +13,8 @@ L'objectif principal est de garantir :
 
 L'infrastructure est répartie entre deux sites :
 
-- **Site A : On-Premise LAN**
-- **Site B : Remote DMZ**
+- **Site A : On-Premise**
+- **Site B : Remote**
 
 Les deux sites communiquent via un **tunnel sécurisé OpenVPN**.
 
@@ -191,7 +191,7 @@ Cette segmentation limite les risques de **mouvement latéral** en cas d'attaque
 |------|------|------|
 | 1 | Git Fetch / Pull | Requête SSH sortante vers GitHub |
 | 2 | Packfile Response | Réception des données compressées du dépôt |
-| 3 | Convergence locale | Exécution d'Ansible sur localhost |
+| 3 | Auto Configuration via Ansible Pull | Exécution d'Ansible sur localhost |
 | 4 | Secret Fetching | Récupération des secrets via Vault |
 
 ---
@@ -210,13 +210,13 @@ Ce tunnel permet :
 
 # 7. Composants de l'infrastructure
 
-## Site A – On-Premise LAN
+## Site A – On-Premise
 
 - App Server  
 - Monitoring Server  
 - Firewall pfSense  
 
-## Site B – Remote DMZ
+## Site B – Remote
 
 - Bastion Server  
 - Vault-IPAM  
@@ -229,7 +229,7 @@ Ce tunnel permet :
 | Composant | Rôle |
 |------|------|
 | GitHub | Source de vérité de l'infrastructure |
-| Ansible Pull | Automatisation et convergence des serveurs |
+| Ansible Pull | Automatisation et Configuration des serveurs |
 | pfSense | Protection périmétrique du réseau |
 | Bastion Host | Accès administrateur sécurisé |
 | Vault-IPAM | Gestion sécurisée des secrets et IP |
