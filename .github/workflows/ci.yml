@@ -45,20 +45,19 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Read Versions File
+      - name: Read Versions
         id: versions
         shell: bash
         run: |
           set -euo pipefail
-          source .github/workflows/ci-versions.env
           {
-            echo "terraform_version=${TERRAFORM_VERSION}"
-            echo "tflint_version=${TFLINT_VERSION}"
-            echo "tfsec_version=${TFSEC_VERSION}"
-            echo "python_version=${PYTHON_VERSION}"
-            echo "ansible_version=${ANSIBLE_VERSION}"
-            echo "ansible_lint_version=${ANSIBLE_LINT_VERSION}"
-            echo "yamllint_version=${YAMLLINT_VERSION}"
+            echo "terraform_version=${{vars.TERRAFORM_VERSION}}"
+            echo "tflint_version=${{vars.TFLINT_VERSION}}"
+            echo "tfsec_version=${{vars.TFSEC_VERSION}}"
+            echo "python_version=${{vars.PYTHON_VERSION}}"
+            echo "ansible_version=${{vars.ANSIBLE_VERSION}}"
+            echo "ansible_lint_version=${{vars.ANSIBLE_LINT_VERSION}}"
+            echo "yamllint_version=${{vars.YAMLLINT_VERSION}}"
           } >> "$GITHUB_OUTPUT"
   terraform:
     needs: [changes, versions]
