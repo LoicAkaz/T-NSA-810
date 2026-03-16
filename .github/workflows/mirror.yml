@@ -12,6 +12,10 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - name: Test access
+        run: |
+          [ -n "${{ secrets.SCHOOL_TOKEN }}" ] || (echo "SCHOOL_TOKEN vide" && exit 1)
+          git ls-remote "https://x-access-token:${{ secrets.SCHOOL_TOKEN }}@github.com/EpitechMscProPromo2027/T-NSA-810-PAR_19.git" HEAD
 
       - name: Push to school repo
         run: |
