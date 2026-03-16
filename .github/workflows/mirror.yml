@@ -15,5 +15,5 @@ jobs:
 
       - name: Push to school repo
         run: |
-          git remote add school https://x-access-token:${{ secrets.PAT }}@github.com/EpitechMscProPromo2027/T-NSA-810-PAR_19.git
+          git remote add school https://x-access-token:${{ secrets.SCHOOL_TOKEN }}@github.com/EpitechMscProPromo2027/T-NSA-810-PAR_19.git
           git push --mirror school
