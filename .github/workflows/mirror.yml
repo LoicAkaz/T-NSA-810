@@ -34,9 +34,13 @@ jobs:
           echo "Checking access to target repository..."
           if ! git ls-remote --exit-code school > /dev/null 2>&1; then
             echo "Cannot access target repository."
-            echo "Check repository path, token scopes (contents:write), org approval, and SSO authorization."
+            echo "Check repository path, token scopes (contents:write + workflows:write), org approval, and SSO authorization."
             exit 1
           fi
 
       - name: Push to school repo
-        run: git push --mirror school
+        env:
+          SOURCE_BRANCH: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          git push school "refs/heads/${SOURCE_BRANCH}:refs/heads/${SOURCE_BRANCH}"
