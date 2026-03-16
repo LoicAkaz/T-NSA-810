@@ -7,40 +7,13 @@ on:
 jobs:
   mirror:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
 
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          persist-credentials: false
-
-      - name: Validate mirror access
-        env:
-          SCHOOL_TOKEN: ${{ secrets.SCHOOL_TOKEN }}
-          TARGET_REPO: EpitechMscProPromo2027/T-NSA-810-PAR_19.git
-        run: |
-          set -euo pipefail
-
-          if [ -z "${SCHOOL_TOKEN}" ]; then
-            echo "SCHOOL_TOKEN is empty or undefined."
-            exit 1
-          fi
-
-          REMOTE_URL="https://x-access-token:${SCHOOL_TOKEN}@github.com/${TARGET_REPO}"
-          git remote add school "${REMOTE_URL}"
-
-          echo "Checking access to target repository..."
-          if ! git ls-remote --exit-code school > /dev/null 2>&1; then
-            echo "Cannot access target repository."
-            echo "Check repository path, token scopes (contents:write + workflows:write), org approval, and SSO authorization."
-            exit 1
-          fi
 
       - name: Push to school repo
-        env:
-          SOURCE_BRANCH: ${{ github.ref_name }}
         run: |
-          set -euo pipefail
-          git push school "refs/heads/${SOURCE_BRANCH}:refs/heads/${SOURCE_BRANCH}"
+          git remote add school https://x-access-token:${{ secrets.PAT }}@github.com/EpitechMscProPromo2027/T-NSA-810-PAR_19.git
+          git push --mirror school
