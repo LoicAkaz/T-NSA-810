@@ -1,0 +1,19 @@
+name: Mirror repository
+on:
+    push:
+        branches:
+          - main
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+
+    steps:
+        - uses: actions/checkout@v4
+          with:
+            fetch-depth: 0
+        
+        - name: Push to school repo
+          run: |
+            git remote add school  https://x-access-token:${{ secrets.SCHOOL_TOKEN }}@github.com/EpitechMscProPromo2027/T-NSA-810-PAR_19.git
+            git push --mirror school
