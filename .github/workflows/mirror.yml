@@ -1,4 +1,5 @@
 name: Mirror repository
+
 on:
   push:
     branches:
@@ -9,15 +10,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Test access
-        run: |
-          [ -n "${{ secrets.SCHOOL_TOKEN }}" ] || (echo "SCHOOL_TOKEN vide" && exit 1)
-          git ls-remote "https://x-access-token:${{ secrets.SCHOOL_TOKEN }}@github.com/EpitechMscProPromo2027/T-NSA-810-PAR_19.git" HEAD
 
-      - name: Push to school repo
+      - name: Setup Git identity
+        run: |
+          git config --global user.name "CI Bot"
+          git config --global user.email "ci@github.com"
+
+      - name: Add school remote
         run: |
           git remote add school https://x-access-token:${{ secrets.SCHOOL_TOKEN }}@github.com/EpitechMscProPromo2027/T-NSA-810-PAR_19.git
-          git push --mirror school
+
+      - name: Push main branch only
+        run: |
+          git push school main --force
