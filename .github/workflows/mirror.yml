@@ -14,22 +14,6 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Verify token access to school repo
-        env:
-          SCHOOL_TOKEN: ${{ secrets.SCHOOL_TOKEN }}
-        run: |
-          set -euo pipefail
-          [ -n "${SCHOOL_TOKEN}" ] || (echo "SCHOOL_TOKEN is empty" && exit 1)
-
-          CODE=$(curl -sS -o response.json -w "%{http_code}" \
-            -H "Authorization: Bearer ${SCHOOL_TOKEN}" \
-            -H "Accept: application/vnd.github+json" \
-            https://api.github.com/repos/EpitechMscProPromo2027/T-NSA-810-PAR_19)
-
-          echo "GitHub API status: ${CODE}"
-          cat response.json
-          test "${CODE}" = "200"
-
       - name: Push main to school repo
         run: |
           set -euo pipefail
