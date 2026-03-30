@@ -17,8 +17,8 @@ jobs:
 
       - name: Setup Git identity
         run: |
-          git config --global user.name "CI Bot"
-          git config --global user.email "ci@github.com"
+          git config --global user.name "Wilfried Djoum"
+          git config --global user.email "wilfrieddjoum@gmail.com"
 
       - name: Add school remote
         run: |
