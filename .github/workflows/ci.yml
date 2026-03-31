@@ -1,73 +1,154 @@
 name: CI - Iac Validation
 
 on:
-    push:
-        branches: ["**"]
-    pull_request:
-        branches: [main]
+  push:
+    branches: ["**"]
+    paths:
+      - "infra/**"
+      - "ansible/**"
+      - ".github/workflows/ci.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "infra/**"
+      - "ansible/**"
+      - ".github/workflows/ci.yml"
 
 jobs:
-    terraform:
-        name: Terraform Check
-        runs-on: ubuntu-latest
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      infra: ${{steps.filter.outputs.infra}}
+      ansible: ${{steps.filter.outputs.ansible}}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            infra:
+              - 'infra/**'
+            ansible:
+              - 'ansible/**'
+  versions:
+    name: Load CI Versions
+    runs-on: ubuntu-latest
+    outputs:
+      terraform_version: ${{vars.TERRAFORM_VERSION}}
+      tflint_version: ${{ vars.TFLINT_VERSION }}
+      tfsec_version: ${{ vars.TFSEC_VERSION }}
+      python_version: ${{ vars.PYTHON_VERSION }}
+      ansible_version: ${{ vars.ANSIBLE_VERSION }}
+      ansible_lint_version: ${{ vars.ANSIBLE_LINT_VERSION }}
+      yamllint_version: ${{ vars.YAMLLINT_VERSION}}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-        defaults:
-            run:
-                working-directory: infra
+      - name: Read Versions
+        id: versions
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "terraform_version=${{vars.TERRAFORM_VERSION}}"
+            echo "tflint_version=${{vars.TFLINT_VERSION}}"
+            echo "tfsec_version=${{vars.TFSEC_VERSION}}"
+            echo "python_version=${{vars.PYTHON_VERSION}}"
+            echo "ansible_version=${{vars.ANSIBLE_VERSION}}"
+            echo "ansible_lint_version=${{vars.ANSIBLE_LINT_VERSION}}"
+            echo "yamllint_version=${{vars.YAMLLINT_VERSION}}"
+          } >> "$GITHUB_OUTPUT"
+  terraform:
+    needs: [changes, versions]
+    if: ${{needs.changes.outputs.infra == 'true'}}
+    name: Terraform Check
+    runs-on: ubuntu-latest
 
-        steps:
-            - name: Checkout Repository
-              uses: actions/checkout@v4
+    defaults:
+      run:
+        working-directory: infra
 
-            - name: Setup Terraform
-              uses: hashicorp/setup-terraform@v3
-              with:
-                  terraform_version: 1.14.5
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-            - name: Terraform Fmt
-              run: terraform fmt -check -recursive
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{vars.TERRAFORM_VERSION}}
 
-            - name: Terraform Init
-              run: terraform init -backend=false
+      - name: Terraform Fmt
+        run: terraform fmt -check -recursive
 
-            - name: Terraform Validate
-              run: terraform validate
+      - name: Terraform Init
+        run: terraform init -backend=false
 
-            - name: Install TFLint
-              run: curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+      - name: Terraform Validate
+        run: terraform validate
 
-            - name: Run TFLint
-              run: tflint --recursive
+      - name: Setup TFLint
+        uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: ${{vars.TFLINT_VERSION}}
 
-            - name: Run TFSec (Security)
-              uses: aquasecurity/tfsec-action@v1.0.3
-              with:
-                  working_directory: infra
+      - name: Run TFLint
+        run: tflint --recursive
 
-    ansible:
-        name: Ansible Checks
-        runs-on: ubuntu-latest
-        needs: terraform
+      - name: Install tfsec
+        shell: bash
+        env:
+          TFSEC_VERSION: ${{vars.TFSEC_VERSION}}
+        run: |
+          set -euo pipefail
+          mkdir -p "${HOME}/.local/bin"
+          curl -sSfL "https://github.com/aquasecurity/tfsec/releases/download/${TFSEC_VERSION}/tfsec-linux-amd64" -o "${HOME}/.local/bin/tfsec"
+          chmod +x "${HOME}/.local/bin/tfsec"
+          echo "${HOME}/.local/bin" >> "$GITHUB_PATH"
+          tfsec --version
 
-        defaults:
-            run:
-                working-directory: ansible
+      - name: Run TFSec (Security)
+        run: tfsec .
 
-        steps:
-            - name: Checkout Repository
-              uses: actions/checkout@v4
+  ansible:
+    needs: [changes, versions]
+    if: ${{needs.changes.outputs.ansible == 'true'}}
+    name: Ansible Checks
+    runs-on: ubuntu-latest
 
-            - name: Setup Python
-              uses: actions/setup-python@v5
-              with:
-                  python-version: "3.11"
+    defaults:
+      run:
+        working-directory: ansible
 
-            - name: Install Ansible and Lint Tools
-              run: |
-                  pip install ansible ansible-lint yamllint
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-            - name: Run YAML Lint
-              run: yamllint .
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{vars.PYTHON_VERSION}}
 
-            - name: Run Ansible Lint
-              run: ansible-lint .
+      - name: Install Ansible and Lint Tools
+        shell: bash
+        env:
+          ANSIBLE_VERSION: ${{vars.ANSIBLE_VERSION}}
+          ANSIBLE_LINT_VERSION: ${{vars.ANSIBLE_LINT_VERSION}}
+          YAMLLINT_VERSION: ${{vars.YAMLLINT_VERSION}}
+        run: |
+          pip install \
+            "ansible==${ANSIBLE_VERSION}" \
+            "ansible-lint==${ANSIBLE_LINT_VERSION}" \
+            "yamllint==${YAMLLINT_VERSION}"
+
+      # - name: Run Ansible Syntax Check
+        # run: |
+        #   ansible-playbook --syntax-check playbooks/site.yml
+        #   ansible-playbook --syntax-check -i inventory/local.yml playbooks/local.yml
+        #   ansible-playbook --syntax-check -i inventory/onprem.yml playbooks/onprem.yml
+
+      - name: Run YAML Lint
+        run: yamllint .
+
+      - name: Run Ansible Lint
+        run: ansible-lint .
