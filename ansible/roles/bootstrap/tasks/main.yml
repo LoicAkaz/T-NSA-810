@@ -1,0 +1,40 @@
+---
+# roles/bootstrap/tasks/main.yml
+
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Install required packages (git + ansible)
+  ansible.builtin.apt:
+    name:
+      - git
+      - ansible
+    state: present
+
+- name: Print welcome message
+  ansible.builtin.debug:
+    msg: |
+      ============================================
+       {{ welcome_message }}
+      --------------------------------------------
+       Owner   : {{ server_owner }}
+       Host    : {{ inventory_hostname }}
+       OS      : {{ ansible_distribution }} {{ ansible_distribution_version }}
+       Kernel  : {{ ansible_kernel }}
+       Repo    : {{ ansible_pull_repo }}
+      ============================================
+
+- name: Set up ansible-pull cron job
+  ansible.builtin.cron:
+    name: "ansible-pull"
+    minute: "*/10"
+    job: >
+      ansible-pull
+      -U {{ ansible_pull_repo }}
+      -C {{ ansible_pull_branch }}
+      {{ ansible_pull_playbook }}
+      >> /var/log/ansible-pull.log 2>&1
+    user: root
+    state: present

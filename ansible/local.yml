@@ -1,0 +1,10 @@
+---
+# local.yml — Main entry point playbook
+# Run with: ansible-playbook local.yml
+
+- name: Bootstrap VPS servers
+  hosts: vps          # targets the [vps] group in inventory/hosts.ini
+  gather_facts: true  # collects OS info (used in the welcome message)
+
+  roles:
+    - bootstrap        # runs roles/bootstrap/tasks/main.yml
