@@ -139,11 +139,14 @@ echo "════════════════════════�
 VAULT_ARGS=""
 [ -f /root/.vault_pass ] && VAULT_ARGS="--vault-password-file /root/.vault_pass"
 
+echo "Starting Ansible Pull at $(date +'%Y-%m-%d %H:%M:%S')"
+echo "/usr/bin/ansible-pull -U $REPO_URL -C $REPO_BRANCH -i $INVENTORY --limit $(hostname) $VAULT_ARGS $PLAYBOOK"
+
 ansible-pull \
     -U "$REPO_URL" \
     -C "$REPO_BRANCH" \
-    -i inventory/hosts.yml \
-    --limit "$(hostname -s)" \
+    -i "$INVENTORY" \
+    --limit "$(hostname)" \
     $VAULT_ARGS \
     "$PLAYBOOK"
 
@@ -157,6 +160,7 @@ cat > /etc/ansible-pull.env <<EOF
 REPO_URL="$REPO_URL"
 REPO_BRANCH="$REPO_BRANCH"
 PLAYBOOK="$PLAYBOOK"
+INVENTORY="$INVENTORY"
 EOF
 chmod 600 /etc/ansible-pull.env
 success "Environnement écrit dans /etc/ansible-pull.env"
