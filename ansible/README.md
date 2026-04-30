@@ -1,12 +1,12 @@
 
 ---
 
-# 📁 4️⃣ `ansible/README.md`
+# `ansible/README.md`
 
 ```markdown
 # Configuration Management (Ansible)
 
-## 📌 Purpose
+## Purpose
 
 This directory contains Ansible configuration used to configure all provisioned machines.
 
@@ -14,7 +14,7 @@ We use Ansible Pull mode.
 
 ---
 
-## 🧠 Configuration Model
+##Configuration Model
 
 Each VM pulls configuration from this repository using:
 
