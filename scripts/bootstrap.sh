@@ -50,16 +50,8 @@ success "Hostname défini : $(hostname)"
 
 # ── 2. Dépendances ──────────────────────────────────────────────────────────
 log "Mise à jour des paquets et installation des dépendances..."
-if command -v apt-get &>/dev/null; then
-    apt-get update -qq
-    apt-get install -y -qq ansible git curl logrotate
-elif command -v dnf &>/dev/null; then
-    dnf install -y ansible git logrotate --exclude=curl
-elif command -v yum &>/dev/null; then
-    yum install -y ansible git curl logrotate
-else
-    error "Aucun gestionnaire de paquets supporté trouvé"
-fi
+apt-get update -qq
+apt-get install -y -qq ansible git curl logrotate
 success "Dépendances installées (ansible $(ansible --version | head -1 | awk '{print $3}'))"
 
 # ── 3. Clé SSH deploy (dépôt privé) ─────────────────────────────────────────
@@ -139,14 +131,11 @@ echo "════════════════════════�
 VAULT_ARGS=""
 [ -f /root/.vault_pass ] && VAULT_ARGS="--vault-password-file /root/.vault_pass"
 
-echo "Starting Ansible Pull at $(date +'%Y-%m-%d %H:%M:%S')"
-echo "/usr/bin/ansible-pull -U $REPO_URL -C $REPO_BRANCH -i $INVENTORY --limit $(hostname) $VAULT_ARGS $PLAYBOOK"
-
 ansible-pull \
     -U "$REPO_URL" \
     -C "$REPO_BRANCH" \
     -i "$INVENTORY" \
-    --limit "$(hostname)" \
+    --limit "$(hostname -s)" \
     $VAULT_ARGS \
     "$PLAYBOOK"
 
@@ -168,11 +157,9 @@ success "Environnement écrit dans /etc/ansible-pull.env"
 # ── 7. Cron ─────────────────────────────────────────────────────────────────
 log "Configuration du cron ($CRON_SCHEDULE)..."
 CRON_LINE="$CRON_SCHEDULE root $PULL_SCRIPT >> $LOG_FILE 2>&1"
-mkdir -p /etc/cron.d
 CRON_FILE="/etc/cron.d/ansible-pull"
 echo "$CRON_LINE" > "$CRON_FILE"
 chmod 644 "$CRON_FILE"
-systemctl enable --now crond 2>/dev/null || systemctl enable --now cron 2>/dev/null || true
 success "Cron configuré : $CRON_FILE"
 
 # ── 8. Premier pull ──────────────────────────────────────────────────────────
