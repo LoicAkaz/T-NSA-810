@@ -1,0 +1,9 @@
+timezone: Europe/Paris
+ 
+base_packages:
+  - curl
+  - git
+  - vim
+  - ufw
+  - fail2ban
+  - chrony
