@@ -25,11 +25,11 @@
       PermitRootLogin no
       PasswordAuthentication no
       KbdInteractiveAuthentication no
-      PublicKeyAuthentication yes
+      PubkeyAuthentication  yes
       PermitEmptyPasswords no
       X11Forwarding no
       AllowTcpForwarding {{ssh_allow_tcp_forwarding}}
-      MaxAuthtries {{ssh_max_auth_tries}}
+      MaxAuthTries {{ssh_max_auth_tries}}
       LoginGraceTime {{ssh_login_grace_time}}
       ClientAliveInterval {{ssh_client_alive_interval}}
       ClientAliveCountMax {{ssh_client_alive_count_max}}
@@ -50,4 +50,4 @@
     name: ssh
     state: restarted
     enabled: true
-    when: ssh_hardening_conf.changed or (ssh_allowusers_line is defined and ssh_allowusers_line.changed)
+  when: ssh_hardening_conf.changed or (ssh_allowusers_line is defined and ssh_allowusers_line.changed)
