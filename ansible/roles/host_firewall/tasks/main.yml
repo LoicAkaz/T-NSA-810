@@ -6,9 +6,8 @@
     cache_valid_time: 3600
 
 - name: Allow SSh before enabling firewall
-  ansible.builtin.ufw:
+  community.general.ufw:
     rule: allow
-    name: OpenSSH
     port: "{{host_firewall_ssh_port}}"
     protocol: tcp
     comment: "SSH management access"
@@ -26,13 +25,11 @@
 
 - name: Default deny incoming traffic
   community.general.ufw:
-    default: deny
     direction: incoming
     policy: deny
 
 - name: Default allow outgoing traffic
   community.general.ufw:
-    default: allow
     direction: outgoing
     policy: allow
 
