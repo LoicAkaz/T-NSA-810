@@ -17,3 +17,9 @@
     
     - role: system_baseline
       when: "'env_staging' in group_names"
+
+    - role: ssh_hardening
+      when: "'env_staging' in group_names"
+
+    - role: host_firewall
+      when: "'env_staging' in group_names"
