@@ -28,7 +28,7 @@
       PublicKeyAuthentication yes
       PermitEmptyPasswords no
       X11Forwarding no
-      AllowTcpForwarding {{allow_tcp_forwarding}}
+      AllowTcpForwarding {{ssh_allow_tcp_forwarding}}
       MaxAuthtries {{ssh_max_auth_tries}}
       LoginGraceTime {{ssh_login_grace_time}}
       ClientAliveInterval {{ssh_client_alive_interval}}
