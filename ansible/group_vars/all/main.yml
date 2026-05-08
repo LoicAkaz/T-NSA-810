@@ -1,5 +1,5 @@
 timezone: Europe/Paris
- 
+
 base_packages:
   - curl
   - git
@@ -7,3 +7,24 @@ base_packages:
   - ufw
   - fail2ban
   - chrony
+
+ssh_port: 22
+ssh_allow_tcp_forwarding: no
+ssh_max_auth_tries: 3
+ssh_login_grace_time: 30s
+ssh_client_alive_interval: 300
+ssh_client_alive_count_max: 2
+ssh_allowed_users:
+  - admin
+  - root
+  - deploy
+
+host_firewall_ssh_port: 22
+host_firewall_logging: "on"
+host_firewall_in_rules:
+  - port: 80
+    proto: tcp
+    comment: "Allow HTTP traffic"
+  - port: 443
+    proto: tcp
+    comment: "Allow HTTPS traffic"
