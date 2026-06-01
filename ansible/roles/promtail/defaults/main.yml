@@ -1,0 +1,21 @@
+---
+# =============================================================================
+# promtail — defaults
+# Agent de collecte de logs vers Loki
+# =============================================================================
+
+promtail_version: "3.0.0"
+promtail_user: promtail
+promtail_port: 9080   # port HTTP interne de promtail (métriques)
+
+# Adresse du serveur Loki central
+loki_push_url: "http://observability:3100/loki/api/v1/push"
+
+# Répertoire de positions (curseurs de lecture des fichiers de log)
+promtail_positions_dir: /var/lib/promtail
+promtail_config_dir: /etc/promtail
+
+# Labels communs ajoutés à tous les logs de ce host
+promtail_extra_labels: {}
+#  env: "production"
+#  team: "infra"

@@ -1,6 +1,0 @@
----
-# roles/bootstrap/defaults/main.yml
-# Valeurs par défaut — surchargées par group_vars/all.yml
-
-welcome_message: "Hello from Ansible Pull from bootstrap 1!"
-server_owner: "Admin"

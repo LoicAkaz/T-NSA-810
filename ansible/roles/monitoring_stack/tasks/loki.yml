@@ -1,0 +1,95 @@
+---
+# =============================================================================
+# monitoring_stack — tasks/loki.yml
+# =============================================================================
+
+- name: "loki | create system user"
+  ansible.builtin.user:
+    name: "{{ loki_user }}"
+    system: true
+    shell: /usr/sbin/nologin
+    create_home: false
+
+- name: "loki | create directories"
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ loki_user }}"
+    group: "{{ loki_user }}"
+    mode: "0755"
+  loop:
+    - "{{ loki_config_dir }}"
+    - "{{ loki_data_dir }}"
+    - "{{ loki_data_dir }}/chunks"
+    - "{{ loki_data_dir }}/index"
+    - "{{ loki_data_dir }}/cache"
+
+- name: "loki | check installed version"
+  ansible.builtin.command: /usr/local/bin/loki --version
+  register: loki_installed_version
+  changed_when: false
+  failed_when: false
+
+- name: "loki | download binary"
+  ansible.builtin.get_url:
+    url: "https://github.com/grafana/loki/releases/download/v{{ loki_version }}/loki-linux-amd64.zip"
+    dest: "/tmp/loki-{{ loki_version }}.zip"
+    mode: "0644"
+  when: >
+    loki_installed_version.rc != 0 or
+    loki_version not in loki_installed_version.stdout
+
+- name: "loki | install unzip"
+  ansible.builtin.package:
+    name: unzip
+    state: present
+  when: >
+    loki_installed_version.rc != 0 or
+    loki_version not in loki_installed_version.stdout
+
+- name: "loki | extract binary"
+  ansible.builtin.unarchive:
+    src: "/tmp/loki-{{ loki_version }}.zip"
+    dest: /tmp
+    remote_src: true
+  when: >
+    loki_installed_version.rc != 0 or
+    loki_version not in loki_installed_version.stdout
+
+- name: "loki | install binary"
+  ansible.builtin.copy:
+    src: /tmp/loki-linux-amd64
+    dest: /usr/local/bin/loki
+    remote_src: true
+    owner: root
+    group: root
+    mode: "0755"
+  notify: restart loki
+  when: >
+    loki_installed_version.rc != 0 or
+    loki_version not in loki_installed_version.stdout
+
+- name: "loki | deploy config"
+  ansible.builtin.template:
+    src: loki.yml.j2
+    dest: "{{ loki_config_dir }}/loki.yml"
+    owner: "{{ loki_user }}"
+    group: "{{ loki_user }}"
+    mode: "0644"
+  notify: restart loki
+
+- name: "loki | deploy systemd unit"
+  ansible.builtin.template:
+    src: loki.service.j2
+    dest: /etc/systemd/system/loki.service
+    owner: root
+    group: root
+    mode: "0644"
+  notify: restart loki
+
+- name: "loki | ensure service is started and enabled"
+  ansible.builtin.systemd:
+    name: loki
+    state: started
+    enabled: true
+    daemon_reload: true

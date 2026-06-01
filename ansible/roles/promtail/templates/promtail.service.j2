@@ -1,0 +1,19 @@
+[Unit]
+Description=Promtail log shipping agent
+Documentation=https://grafana.com/docs/loki/latest/send-data/promtail/
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User={{ promtail_user }}
+Group={{ promtail_user }}
+ExecStart=/usr/local/bin/promtail \
+  -config.file={{ promtail_config_dir }}/promtail.yml
+Restart=on-failure
+RestartSec=5s
+# Accès au journal systemd
+SupplementaryGroups=systemd-journal
+
+[Install]
+WantedBy=multi-user.target

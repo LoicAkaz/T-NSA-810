@@ -1,0 +1,11 @@
+---
+# =============================================================================
+# group_vars/all/vault.yml (EXTRAIT — à merger avec le vault existant)
+# Chiffrer avec : ansible-vault encrypt group_vars/all/vault.yml
+# =============================================================================
+# À ajouter au vault existant :
+
+# vault_alertmanager_email_username: "your-smtp-user"
+# vault_alertmanager_email_password: "your-smtp-password"
+# vault_alertmanager_slack_webhook_url: "https://hooks.slack.com/services/T.../B.../..."
+# vault_grafana_admin_password: "your-grafana-admin-password"

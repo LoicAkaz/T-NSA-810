@@ -1,0 +1,56 @@
+---
+# =============================================================================
+# monitoring_stack — tasks/grafana.yml
+# Installation via le dépôt APT officiel Grafana
+# =============================================================================
+
+- name: "grafana | install dependencies"
+  ansible.builtin.package:
+    name:
+      - apt-transport-https
+      - software-properties-common
+      - gnupg
+    state: present
+
+- name: "grafana | add GPG key"
+  ansible.builtin.get_url:
+    url: https://apt.grafana.com/gpg.key
+    dest: /etc/apt/keyrings/grafana.gpg
+    mode: "0644"
+
+- name: "grafana | add apt repository"
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/etc/apt/keyrings/grafana.gpg] https://apt.grafana.com stable main"
+    state: present
+    filename: grafana
+    update_cache: true
+
+- name: "grafana | install package"
+  ansible.builtin.package:
+    name: "grafana={{ grafana_version }}"
+    state: present
+  notify: restart grafana
+
+- name: "grafana | deploy grafana.ini"
+  ansible.builtin.template:
+    src: grafana.ini.j2
+    dest: /etc/grafana/grafana.ini
+    owner: "{{ grafana_user }}"
+    group: "{{ grafana_user }}"
+    mode: "0640"
+  notify: restart grafana
+
+- name: "grafana | deploy provisioning — datasources"
+  ansible.builtin.template:
+    src: grafana_datasources.yml.j2
+    dest: /etc/grafana/provisioning/datasources/monitoring.yml
+    owner: "{{ grafana_user }}"
+    group: "{{ grafana_user }}"
+    mode: "0640"
+  notify: restart grafana
+
+- name: "grafana | ensure service is started and enabled"
+  ansible.builtin.systemd:
+    name: grafana-server
+    state: started
+    enabled: true
