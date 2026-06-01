@@ -10,7 +10,7 @@ root_url = http://{{ ansible_fqdn | default(ansible_hostname) }}:{{ grafana_port
 [security]
 admin_user = admin
 # admin_password défini dans vault (GRAFANA__SECURITY__ADMIN_PASSWORD ou ci-dessous)
-# admin_password = {{ vault_grafana_admin_password | default('changeme') }}
+admin_password = {{ vault_grafana_admin_password | default('changeme') }}
 disable_gravatar = true
 
 [users]
