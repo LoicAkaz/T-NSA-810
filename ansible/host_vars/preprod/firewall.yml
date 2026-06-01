@@ -13,3 +13,33 @@ host_firewall_in_rules:
     proto: tcp
     from_ip: "{{ hostvars['observability']['ansible_host'] }}"
     comment: "Prometheus scrape node_exporter"
+  - port: "3100"
+    proto: tcp
+    from_ip: "{{ hostvars['bastion']['ansible_host'] }}"
+    comment: "Promtail push — bastion"
+  - port: "3100"
+    proto: tcp
+    from_ip: "{{ hostvars['applicatif']['ansible_host'] }}"
+    comment: "Promtail push — applicatif"
+  - port: "3100"
+    proto: tcp
+    from_ip: "{{ hostvars['netbox']['ansible_host'] }}"
+    comment: "Promtail push — netbox"
+  - port: "3100"
+    proto: tcp
+    from_ip: "{{ hostvars['preprod']['ansible_host'] }}"
+    comment: "Promtail push — preprod"
+
+  # Stack centrale (accès depuis ton réseau d'admin uniquement)
+  - port: "3000"
+    proto: tcp
+    from_ip: "{{ admin_network_cidr }}"
+    comment: "Grafana UI"
+  - port: "9090"
+    proto: tcp
+    from_ip: "{{ admin_network_cidr }}"
+    comment: "Prometheus UI"
+  - port: "9093"
+    proto: tcp
+    from_ip: "{{ admin_network_cidr }}"
+    comment: "Alertmanager UI"
