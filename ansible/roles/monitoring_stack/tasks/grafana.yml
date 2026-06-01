@@ -18,6 +18,16 @@
     dest: /etc/apt/keyrings/grafana.asc
     mode: "0644"
 
+- name: "grafana | clean up old gpg key"
+  ansible.builtin.file:
+    path: /etc/apt/keyrings/grafana.gpg
+    state: absent
+
+- name: "grafana | clean up old apt repository config"
+  ansible.builtin.file:
+    path: /etc/apt/sources.list.d/grafana.list
+    state: absent
+
 - name: "grafana | add apt repository"
   ansible.builtin.apt_repository:
     repo: "deb [signed-by=/etc/apt/keyrings/grafana.asc] https://apt.grafana.com stable main"
