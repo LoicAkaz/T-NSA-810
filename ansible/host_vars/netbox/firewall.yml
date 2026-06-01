@@ -1,0 +1,15 @@
+---
+
+host_firewall_ssh_port: 22
+host_firewall_logging: "on"
+host_firewall_in_rules:
+  - port: 80
+    proto: tcp
+    comment: "Allow HTTP traffic"
+  - port: 443
+    proto: tcp
+    comment: "Allow HTTPS traffic"
+  - port: "9100"
+    proto: tcp
+    from_ip: "{{ hostvars['observability']['ansible_host'] }}"
+    comment: "Prometheus scrape node_exporter"
