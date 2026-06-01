@@ -43,3 +43,5 @@ host_firewall_in_rules:
     proto: tcp
     from_ip: "{{ admin_network_cidr }}"
     comment: "Alertmanager UI"
+
+ssh_allow_tcp_forwarding: "yes"
