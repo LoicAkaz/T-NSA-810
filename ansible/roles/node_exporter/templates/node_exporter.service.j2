@@ -1,0 +1,21 @@
+[Unit]
+Description=Prometheus Node Exporter
+Documentation=https://github.com/prometheus/node_exporter
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User={{ node_exporter_user }}
+Group={{ node_exporter_user }}
+ExecStart=/usr/local/bin/node_exporter \
+  --web.listen-address="{{ node_exporter_listen_address }}" \
+{% for collector in node_exporter_enabled_collectors %}
+  --collector.{{ collector }} \
+{% endfor %}
+  --collector.textfile.directory=/var/lib/node_exporter/textfile_collector
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

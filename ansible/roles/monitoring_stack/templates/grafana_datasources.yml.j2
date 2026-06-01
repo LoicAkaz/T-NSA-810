@@ -1,0 +1,33 @@
+# =============================================================================
+# Grafana datasources — provisionné par Ansible
+# Prometheus + Loki auto-configurés au démarrage
+# =============================================================================
+
+apiVersion: 1
+
+datasources:
+
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://localhost:{{ prometheus_port }}
+    isDefault: true
+    editable: false
+    jsonData:
+      timeInterval: "{{ prometheus_scrape_interval }}"
+
+  - name: Loki
+    type: loki
+    access: proxy
+    url: http://localhost:{{ loki_port }}
+    editable: false
+    jsonData:
+      maxLines: 1000
+
+  - name: Alertmanager
+    type: alertmanager
+    access: proxy
+    url: http://localhost:{{ alertmanager_port }}
+    editable: false
+    jsonData:
+      implementation: prometheus

@@ -1,0 +1,24 @@
+---
+# =============================================================================
+# node_exporter — defaults
+# Déployé sur tous les hosts (cap_observability)
+# =============================================================================
+
+node_exporter_version: "1.8.1"
+node_exporter_user: node_exporter
+node_exporter_port: 9100
+
+# Collectors activés (liste non exhaustive, ajuster selon besoins)
+node_exporter_enabled_collectors:
+  - systemd
+  - processes
+  - filesystem
+  - meminfo
+  - diskstats
+  - netdev
+  - cpu
+  - loadavg
+
+# Restreindre l'écoute à localhost si un reverse proxy est en place
+# sinon laisser 0.0.0.0 pour que Prometheus puisse scraper directement
+node_exporter_listen_address: "0.0.0.0:{{ node_exporter_port }}"

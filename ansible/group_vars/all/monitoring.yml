@@ -1,0 +1,44 @@
+---
+# =============================================================================
+# group_vars/all/monitoring.yml
+# Variables de monitoring communes à tous les hosts
+# Les secrets sont dans vault.yml
+# =============================================================================
+
+# --- Versions (source unique de vérité) ---
+prometheus_version: "2.52.0"
+alertmanager_version: "0.27.0"
+loki_version: "3.0.0"
+grafana_version: "11.0.0"
+node_exporter_version: "1.8.1"
+promtail_version: "3.0.0"
+
+# --- Adresse Loki pour tous les agents Promtail ---
+# "observability" doit être résolvable depuis tous les hosts (DNS interne ou /etc/hosts)
+loki_push_url: "http://observability:3100/loki/api/v1/push"
+
+# --- Prometheus targets ---
+# Ajouter ici tout nouveau host à monitorer
+prometheus_node_exporter_targets:
+  - "bastion:9100"
+  - "applicatif:9100"
+  - "netbox:9100"
+  - "observability:9100"
+  - "preprod:9100"
+
+# --- Alertmanager receivers ---
+# Les credentials sont dans vault.yml (vault_alertmanager_*)
+alertmanager_email_enabled: true
+alertmanager_email_from: "alertmanager@example.com"
+alertmanager_email_to: "ops@example.com"
+alertmanager_email_smarthost: "smtp.example.com:587"
+alertmanager_email_auth_username: "{{ vault_alertmanager_email_username }}"
+alertmanager_email_auth_password: "{{ vault_alertmanager_email_password }}"
+
+alertmanager_slack_enabled: true
+alertmanager_slack_webhook_url: "{{ vault_alertmanager_slack_webhook_url }}"
+alertmanager_slack_channel: "#alerts-infra"
+
+# --- Labels Promtail communs (optionnel) ---
+promtail_extra_labels:
+  env: "production"

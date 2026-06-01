@@ -9,12 +9,22 @@
   force_handlers: true
 
   roles:
-  
-    # - role: bootstrap2
-    #   when: "'env_staging' in group_names"
-    
+
     - role: system_baseline
 
     - role: ssh_hardening
 
     - role: host_firewall
+
+    # Agent metrics - tous les serveurs
+    - role: node_exporter
+      tags: [monitoring, node_exporter]
+
+    # Agent logs - tous les serveurs
+    - role: promtail
+      tags: [monitoring, promtail]
+
+    # Stack centrale - uniquement le serveur observability
+    - role: monitoring_stack
+      when: "'cap_monitoring_central' in group_names"
+      tags: [monitoring, monitoring_stack]

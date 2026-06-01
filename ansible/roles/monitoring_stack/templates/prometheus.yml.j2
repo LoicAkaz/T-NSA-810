@@ -1,0 +1,53 @@
+# =============================================================================
+# Prometheus configuration — généré par Ansible (ne pas éditer manuellement)
+# =============================================================================
+
+global:
+  scrape_interval:     {{ prometheus_scrape_interval }}
+  evaluation_interval: {{ prometheus_evaluation_interval }}
+  external_labels:
+    environment: "production"
+    cluster: "genuka-infra"
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - "localhost:{{ alertmanager_port }}"
+
+rule_files:
+  - "{{ prometheus_config_dir }}/rules/*.yml"
+
+scrape_configs:
+
+  # --- Prometheus lui-même ---
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:{{ prometheus_port }}"]
+
+  # --- Node Exporter — tous les serveurs ---
+  - job_name: "node_exporter"
+    static_configs:
+      - targets:
+{% for target in prometheus_node_exporter_targets %}
+          - "{{ target }}"
+{% endfor %}
+    relabel_configs:
+      - source_labels: [__address__]
+        regex: "([^:]+):\\d+"
+        target_label: instance
+
+  # --- Alertmanager ---
+  - job_name: "alertmanager"
+    static_configs:
+      - targets: ["localhost:{{ alertmanager_port }}"]
+
+  # --- Loki ---
+  - job_name: "loki"
+    static_configs:
+      - targets: ["localhost:{{ loki_port }}"]
+
+  # --- Grafana ---
+  - job_name: "grafana"
+    static_configs:
+      - targets: ["localhost:{{ grafana_port }}"]

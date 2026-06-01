@@ -1,0 +1,31 @@
+# =============================================================================
+# grafana.ini — généré par Ansible (sections essentielles)
+# =============================================================================
+
+[server]
+http_port = {{ grafana_port }}
+domain = {{ ansible_fqdn | default(ansible_hostname) }}
+root_url = http://{{ ansible_fqdn | default(ansible_hostname) }}:{{ grafana_port }}/
+
+[security]
+admin_user = admin
+# admin_password défini dans vault (GRAFANA__SECURITY__ADMIN_PASSWORD ou ci-dessous)
+# admin_password = {{ vault_grafana_admin_password | default('changeme') }}
+disable_gravatar = true
+
+[users]
+allow_sign_up = false
+auto_assign_org_role = Viewer
+
+[auth.anonymous]
+enabled = false
+
+[log]
+mode = console
+level = warn
+
+[alerting]
+enabled = true
+
+[unified_alerting]
+enabled = true

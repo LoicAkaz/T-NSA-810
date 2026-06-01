@@ -1,0 +1,62 @@
+---
+# =============================================================================
+# monitoring_stack — defaults
+# Déployé uniquement sur le groupe cap_monitoring_central (host: observability)
+# =============================================================================
+
+# --- Versions ---
+prometheus_version: "2.52.0"
+grafana_version: "11.0.0"
+alertmanager_version: "0.27.0"
+loki_version: "3.0.0"
+
+# --- Utilisateurs système ---
+prometheus_user: prometheus
+grafana_user: grafana
+alertmanager_user: alertmanager
+loki_user: loki
+
+# --- Ports ---
+prometheus_port: 9090
+grafana_port: 3000
+alertmanager_port: 9093
+loki_port: 3100
+
+# --- Répertoires ---
+prometheus_config_dir: /etc/prometheus
+prometheus_data_dir: /var/lib/prometheus
+alertmanager_config_dir: /etc/alertmanager
+alertmanager_data_dir: /var/lib/alertmanager
+loki_config_dir: /etc/loki
+loki_data_dir: /var/lib/loki
+
+# --- Rétention Prometheus ---
+prometheus_retention_time: "30d"
+prometheus_retention_size: "10GB"
+
+# --- Scrape interval global ---
+prometheus_scrape_interval: "15s"
+prometheus_evaluation_interval: "15s"
+
+# --- Targets node_exporter (à surcharger dans group_vars ou host_vars) ---
+prometheus_node_exporter_targets:
+  - "bastion:9100"
+  - "applicatif:9100"
+  - "netbox:9100"
+  - "observability:9100"
+  - "preprod:9100"
+
+# --- Alertmanager receivers ---
+alertmanager_slack_enabled: false
+alertmanager_slack_webhook_url: ""         # à mettre en vault
+alertmanager_slack_channel: "#alerts"
+
+alertmanager_email_enabled: false
+alertmanager_email_from: "alertmanager@example.com"
+alertmanager_email_to: "ops@example.com"
+alertmanager_email_smarthost: "smtp.example.com:587"
+alertmanager_email_auth_username: ""       # à mettre en vault
+alertmanager_email_auth_password: ""       # à mettre en vault
+
+# --- Loki ---
+loki_retention_period: "744h"   # 31 jours

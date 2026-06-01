@@ -1,0 +1,74 @@
+# =============================================================================
+# Promtail configuration — généré par Ansible
+# =============================================================================
+
+server:
+  http_listen_port: {{ promtail_port }}
+  grpc_listen_port: 0
+  log_level: warn
+
+positions:
+  filename: {{ promtail_positions_dir }}/positions.yaml
+
+clients:
+  - url: {{ loki_push_url }}
+
+scrape_configs:
+
+  # --- Logs système (syslog / journal) ---
+  - job_name: "systemd-journal"
+    journal:
+      max_age: 12h
+      labels:
+        job: systemd-journal
+        host: "{{ inventory_hostname }}"
+{% for key, value in promtail_extra_labels.items() %}
+        {{ key }}: "{{ value }}"
+{% endfor %}
+    relabel_configs:
+      - source_labels: [__journal__systemd_unit]
+        target_label: unit
+      - source_labels: [__journal_priority_keyword]
+        target_label: level
+
+  # --- /var/log/syslog ---
+  - job_name: "syslog"
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: syslog
+          host: "{{ inventory_hostname }}"
+          __path__: /var/log/syslog
+{% for key, value in promtail_extra_labels.items() %}
+          {{ key }}: "{{ value }}"
+{% endfor %}
+
+  # --- /var/log/auth.log ---
+  - job_name: "auth"
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: auth
+          host: "{{ inventory_hostname }}"
+          __path__: /var/log/auth.log
+{% for key, value in promtail_extra_labels.items() %}
+          {{ key }}: "{{ value }}"
+{% endfor %}
+
+  # --- Logs applicatifs (si présents) ---
+  - job_name: "app-logs"
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: app
+          host: "{{ inventory_hostname }}"
+          __path__: /var/log/app/*.log
+{% for key, value in promtail_extra_labels.items() %}
+          {{ key }}: "{{ value }}"
+{% endfor %}
+    pipeline_stages:
+      - drop:
+          expression: ".*health.*check.*"

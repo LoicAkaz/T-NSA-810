@@ -1,0 +1,22 @@
+---
+# =============================================================================
+# monitoring_stack — tasks/main.yml
+# Stack centrale : Prometheus + Grafana + Alertmanager + Loki
+# Cible : cap_monitoring_central (observability uniquement)
+# =============================================================================
+
+- name: "monitoring_stack | import prometheus tasks"
+  ansible.builtin.import_tasks: prometheus.yml
+  tags: [monitoring, prometheus]
+
+- name: "monitoring_stack | import alertmanager tasks"
+  ansible.builtin.import_tasks: alertmanager.yml
+  tags: [monitoring, alertmanager]
+
+- name: "monitoring_stack | import loki tasks"
+  ansible.builtin.import_tasks: loki.yml
+  tags: [monitoring, loki]
+
+- name: "monitoring_stack | import grafana tasks"
+  ansible.builtin.import_tasks: grafana.yml
+  tags: [monitoring, grafana]
