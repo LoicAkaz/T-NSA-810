@@ -1,0 +1,42 @@
+- name: Ensure UFW package is installed
+  ansible.builtin.apt:
+    name: ufw
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Allow SSh before enabling firewall
+  community.general.ufw:
+    rule: allow
+    port: "{{host_firewall_ssh_port}}"
+    protocol: tcp
+    comment: "SSH management access"
+
+- name: Apply additional inbound rules
+  community.general.ufw:
+    rule: "{{item.rule | default('allow') }}"
+    port: "{{item.port}}"
+    proto: "{{item.proto | default('tcp') }}"
+    from_ip: "{{item.from_ip | default('any')}}"
+    comment: "{{ item.comment | default('managed by ansible') }}"
+  loop: "{{ host_firewall_in_rules | default([]) }}"
+  loop_control:
+    label: "{{ item.port }}/{{ item.proto | default('tcp') }}"
+
+- name: Default deny incoming traffic
+  community.general.ufw:
+    direction: incoming
+    policy: deny
+
+- name: Default allow outgoing traffic
+  community.general.ufw:
+    direction: outgoing
+    policy: allow
+
+- name: Enable UFW logging
+  community.general.ufw:
+    logging: "{{host_firewall_logging}}"
+
+- name: Enable FW
+  community.general.ufw:
+    state: enabled

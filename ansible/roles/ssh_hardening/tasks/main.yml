@@ -1,0 +1,53 @@
+- name: Ensure OpenSSH server is installed
+  ansible.builtin.apt:
+    name: openssh-server
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Ensure sshd drop-in directory exists
+  ansible.builtin.file:
+    path: /etc/ssh/sshd_config.d
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Deploy SSH hardening configuration
+  ansible.builtin.copy:
+    dest: /etc/ssh/sshd_config.d/99-hardening.conf
+    owner: root
+    group: root
+    mode: "0644"
+    validate: /usr/sbin/sshd -t -f %s
+    content: |
+      Port {{ssh_port}}
+      PermitRootLogin no
+      PasswordAuthentication no
+      KbdInteractiveAuthentication no
+      PubkeyAuthentication  yes
+      PermitEmptyPasswords no
+      X11Forwarding no
+      AllowTcpForwarding {{ssh_allow_tcp_forwarding}}
+      MaxAuthTries {{ssh_max_auth_tries}}
+      LoginGraceTime {{ssh_login_grace_time}}
+      ClientAliveInterval {{ssh_client_alive_interval}}
+      ClientAliveCountMax {{ssh_client_alive_count_max}}
+      UsePAM yes
+  register: ssh_hardening_conf
+
+- name: Restrict SSH users
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config.d/99-hardening.conf
+    regexp: "^AllowUsers"
+    line: "AllowUsers {{ ssh_allowed_users | join(' ') }}"
+    validate: /usr/sbin/sshd -t -f %s
+  when: (ssh_allowed_users | default([])) | length > 0
+  register: ssh_allowusers_line
+
+- name: Restart SSH if config changed
+  ansible.builtin.service:
+    name: ssh
+    state: restarted
+    enabled: true
+  when: ssh_hardening_conf.changed or (ssh_allowusers_line is defined and ssh_allowusers_line.changed)
