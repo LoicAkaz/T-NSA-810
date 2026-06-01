@@ -15,12 +15,12 @@
 - name: "grafana | add GPG key"
   ansible.builtin.get_url:
     url: https://apt.grafana.com/gpg.key
-    dest: /etc/apt/keyrings/grafana.gpg
+    dest: /etc/apt/keyrings/grafana.asc
     mode: "0644"
 
 - name: "grafana | add apt repository"
   ansible.builtin.apt_repository:
-    repo: "deb [signed-by=/etc/apt/keyrings/grafana.gpg] https://apt.grafana.com stable main"
+    repo: "deb [signed-by=/etc/apt/keyrings/grafana.asc] https://apt.grafana.com stable main"
     state: present
     filename: grafana
     update_cache: true
