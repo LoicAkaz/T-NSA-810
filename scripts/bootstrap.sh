@@ -98,20 +98,20 @@ else
 fi
 
 # ── 4. Rotation des logs ─────────────────────────────────────────────────────
-log "Configuration de la rotation des logs..."
-cat > /etc/logrotate.d/ansible-pull <<EOF
-$LOG_FILE {
-    daily
-    rotate $LOG_RETENTION_DAYS
-    compress
-    missingok
-    notifempty
-    create 640 root root
-}
-EOF
-touch "$LOG_FILE"
-chmod 640 "$LOG_FILE"
-success "Rotation des logs configurée ($LOG_RETENTION_DAYS jours)"
+#log "Configuration de la rotation des logs..."
+#cat > /etc/logrotate.d/ansible-pull <<EOF
+#$LOG_FILE {
+#    daily
+#    rotate $LOG_RETENTION_DAYS
+#    compress
+#    missingok
+#    notifempty
+#    create 640 root root
+#}
+#EOF
+#touch "$LOG_FILE"
+#chmod 640 "$LOG_FILE"
+#success "Rotation des logs configurée ($LOG_RETENTION_DAYS jours)"
 
 # ── 5. Script de pull ────────────────────────────────────────────────────────
 PULL_SCRIPT="/usr/local/bin/ansible-pull-run"
