@@ -57,6 +57,25 @@ scrape_configs:
           {{ key }}: "{{ value }}"
 {% endfor %}
 
+  # --- Logs ansible-pull ---
+  - job_name: "ansible-pull"
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: ansible-pull
+          host: "{{ inventory_hostname }}"
+          __path__: /var/log/ansible-pull.log
+{% for key, value in promtail_extra_labels.items() %}
+          {{ key }}: "{{ value }}"
+{% endfor %}
+    pipeline_stages:
+      # Regroupe chaque exécution (bandeau "ansible-pull — <date>" jusqu'au
+      # PLAY RECAP) en une seule entrée Loki au lieu d'une ligne par ligne.
+      - multiline:
+          firstline: '^\s*ansible-pull — \d{4}-\d{2}-\d{2}'
+          max_wait_time: 3s
+
   # --- Logs applicatifs (si présents) ---
   - job_name: "app-logs"
     static_configs:

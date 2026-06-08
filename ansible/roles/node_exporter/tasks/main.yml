@@ -10,6 +10,14 @@
     shell: /usr/sbin/nologin
     create_home: false
 
+- name: "node_exporter | create textfile collector directory"
+  ansible.builtin.file:
+    path: "{{ node_exporter_textfile_dir }}"
+    state: directory
+    owner: "{{ node_exporter_user }}"
+    group: "{{ node_exporter_user }}"
+    mode: "0755"
+
 - name: "node_exporter | check installed version"
   ansible.builtin.command: /usr/local/bin/node_exporter --version
   register: node_exporter_installed_version

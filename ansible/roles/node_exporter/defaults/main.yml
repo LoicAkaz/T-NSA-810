@@ -8,6 +8,9 @@ node_exporter_version: "1.8.1"
 node_exporter_user: node_exporter
 node_exporter_port: 9100
 
+# Répertoire lu par le textfile collector (métriques custom, ex: ansible-pull)
+node_exporter_textfile_dir: /var/lib/node_exporter/textfile_collector
+
 # Collectors activés (liste non exhaustive, ajuster selon besoins)
 node_exporter_enabled_collectors:
   - systemd

@@ -19,3 +19,6 @@ promtail_config_dir: /etc/promtail
 promtail_extra_labels: {}
 #  env: "production"
 #  team: "infra"
+
+# Log des runs ansible-pull (collecté vers Loki + lecture par le groupe adm)
+promtail_ansible_pull_log: /var/log/ansible-pull.log

@@ -21,8 +21,8 @@
     - "{{ loki_config_dir }}"
     - "{{ loki_data_dir }}"
     - "{{ loki_data_dir }}/chunks"
-    - "{{ loki_data_dir }}/index"
-    - "{{ loki_data_dir }}/cache"
+    - "{{ loki_data_dir }}/rules"
+    - "{{ loki_data_dir }}/compactor"
 
 - name: "loki | check installed version"
   ansible.builtin.command: /usr/local/bin/loki --version

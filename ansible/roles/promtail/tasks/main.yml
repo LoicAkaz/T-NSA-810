@@ -92,3 +92,29 @@
     state: started
     enabled: true
     daemon_reload: true
+
+# --- Lecture du log ansible-pull par promtail (membre du groupe adm) ---
+# Self-healing des hosts bootstrappés avant le passage de root:root → root:adm.
+- name: "promtail | stat du log ansible-pull"
+  ansible.builtin.stat:
+    path: "{{ promtail_ansible_pull_log }}"
+  register: promtail_ansible_pull_logfile
+
+- name: "promtail | log ansible-pull lisible par le groupe adm"
+  ansible.builtin.file:
+    path: "{{ promtail_ansible_pull_log }}"
+    group: adm
+    mode: "0640"
+  when: promtail_ansible_pull_logfile.stat.exists
+
+- name: "promtail | stat du logrotate ansible-pull"
+  ansible.builtin.stat:
+    path: /etc/logrotate.d/ansible-pull
+  register: promtail_ansible_pull_logrotate
+
+- name: "promtail | corriger la directive create du logrotate ansible-pull"
+  ansible.builtin.replace:
+    path: /etc/logrotate.d/ansible-pull
+    regexp: '^(\s*create\s+\d+\s+root\s+)root\s*$'
+    replace: '\g<1>adm'
+  when: promtail_ansible_pull_logrotate.stat.exists

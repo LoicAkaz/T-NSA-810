@@ -18,37 +18,72 @@ groups:
           description: "{{ "{{ $labels.instance }}" }} is down for more than 2 minutes (job={{ "{{ $labels.job }}" }})."
 
       - alert: HighCpuUsage
-              expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 85
-              for: 5m
-              labels:
-                severity: warning
-              annotations:
-                summary: "High CPU on {{ "{{ $labels.instance }}" }}"
-                description: 'CPU usage is {{ "{{ printf \"%.1f\" $value }}" }}% on {{ "{{ $labels.instance }}" }}.'
+        expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU on {{ "{{ $labels.instance }}" }}"
+          description: 'CPU usage is {{ "{{ printf \"%.1f\" $value }}" }}% on {{ "{{ $labels.instance }}" }}.'
 
-            - alert: HighMemoryUsage
-              expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 90
-              for: 5m
-              labels:
-                severity: warning
-              annotations:
-                summary: "High memory on {{ "{{ $labels.instance }}" }}"
-                description: 'Memory usage is {{ "{{ printf \"%.1f\" $value }}" }}% on {{ "{{ $labels.instance }}" }}.'
+      - alert: HighMemoryUsage
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 90
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory on {{ "{{ $labels.instance }}" }}"
+          description: 'Memory usage is {{ "{{ printf \"%.1f\" $value }}" }}% on {{ "{{ $labels.instance }}" }}.'
 
-            - alert: DiskSpaceLow
-              expr: (1 - (node_filesystem_avail_bytes{fstype!~"tmpfs|overlay"} / node_filesystem_size_bytes{fstype!~"tmpfs|overlay"})) * 100 > 85
-              for: 10m
-              labels:
-                severity: warning
-              annotations:
-                summary: "Disk almost full on {{ "{{ $labels.instance }}" }}"
-                description: 'Partition {{ "{{ $labels.mountpoint }}" }} is {{ "{{ printf \"%.1f\" $value }}" }}% full.'
+      - alert: DiskSpaceLow
+        expr: (1 - (node_filesystem_avail_bytes{fstype!~"tmpfs|overlay"} / node_filesystem_size_bytes{fstype!~"tmpfs|overlay"})) * 100 > 85
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Disk almost full on {{ "{{ $labels.instance }}" }}"
+          description: 'Partition {{ "{{ $labels.mountpoint }}" }} is {{ "{{ printf \"%.1f\" $value }}" }}% full.'
 
-            - alert: DiskSpaceCritical
-              expr: (1 - (node_filesystem_avail_bytes{fstype!~"tmpfs|overlay"} / node_filesystem_size_bytes{fstype!~"tmpfs|overlay"})) * 100 > 95
-              for: 5m
-              labels:
-                severity: critical
-              annotations:
-                summary: "Disk critically full on {{ "{{ $labels.instance }}" }}"
-                description: 'Partition {{ "{{ $labels.mountpoint }}" }} is {{ "{{ printf \"%.1f\" $value }}" }}% full — intervention requise.'
+      - alert: DiskSpaceCritical
+        expr: (1 - (node_filesystem_avail_bytes{fstype!~"tmpfs|overlay"} / node_filesystem_size_bytes{fstype!~"tmpfs|overlay"})) * 100 > 95
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Disk critically full on {{ "{{ $labels.instance }}" }}"
+          description: 'Partition {{ "{{ $labels.mountpoint }}" }} is {{ "{{ printf \"%.1f\" $value }}" }}% full — intervention requise.'
+
+  # ---------------------------------------------------------------------------
+  # Supervision des runs ansible-pull (métriques exposées via node_exporter
+  # textfile collector, écrites par le callback node_exporter_textfile)
+  # ---------------------------------------------------------------------------
+  - name: ansible_pull
+    interval: 30s
+    rules:
+
+      - alert: AnsiblePullFailed
+        expr: ansible_pull_failed_tasks > 0
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "ansible-pull en échec sur {{ "{{ $labels.instance }}" }}"
+          description: '{{ "{{ printf \"%.0f\" $value }}" }} tâche(s) en échec au dernier ansible-pull sur {{ "{{ $labels.instance }}" }}.'
+
+      - alert: AnsiblePullStale
+        expr: time() - ansible_pull_last_run_timestamp_seconds > 3600
+        for: 0m
+        labels:
+          severity: warning
+        annotations:
+          summary: "ansible-pull obsolète sur {{ "{{ $labels.instance }}" }}"
+          description: 'Aucun ansible-pull réussi depuis plus de {{ "{{ printf \"%.0f\" (div $value 60) }}" }} min sur {{ "{{ $labels.instance }}" }} (cron attendu toutes les 15 min).'
+
+      - alert: AnsiblePullStaleCritical
+        expr: time() - ansible_pull_last_run_timestamp_seconds > 21600
+        for: 0m
+        labels:
+          severity: critical
+        annotations:
+          summary: "ansible-pull muet depuis >6h sur {{ "{{ $labels.instance }}" }}"
+          description: 'Aucun ansible-pull réussi depuis plus de 6 heures sur {{ "{{ $labels.instance }}" }} — intervention requise.'

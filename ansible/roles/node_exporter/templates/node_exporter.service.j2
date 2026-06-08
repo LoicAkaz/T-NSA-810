@@ -13,7 +13,7 @@ ExecStart=/usr/local/bin/node_exporter \
 {% for collector in node_exporter_enabled_collectors %}
   --collector.{{ collector }} \
 {% endfor %}
-  --collector.textfile.directory=/var/lib/node_exporter/textfile_collector
+  --collector.textfile.directory={{ node_exporter_textfile_dir }}
 Restart=on-failure
 RestartSec=5s
 

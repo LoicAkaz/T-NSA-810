@@ -106,10 +106,12 @@ $LOG_FILE {
     compress
     missingok
     notifempty
-    create 640 root root
+    create 640 root adm
 }
 EOF
 touch "$LOG_FILE"
+# Groupe adm pour que promtail (membre de adm) puisse lire le log
+chown root:adm "$LOG_FILE"
 chmod 640 "$LOG_FILE"
 success "Rotation des logs configurée ($LOG_RETENTION_DAYS jours)"
 
