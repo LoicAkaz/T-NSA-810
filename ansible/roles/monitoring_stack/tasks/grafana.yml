@@ -64,3 +64,8 @@
     name: grafana-server
     state: started
     enabled: true
+
+- name: Reset Grafana admin password
+  command: grafana-cli admin reset-admin-password "{{ vault_grafana_admin_password }}"
+  become: true
+  notify: restart grafana
