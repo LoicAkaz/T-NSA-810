@@ -39,7 +39,8 @@ echo ""
 
 # ── 1. Hostname ─────────────────────────────────────────────────────────────
 log "Définition du hostname → $SERVER_HOSTNAME"
-hostnamectl set-hostname "$SERVER_HOSTNAME"
+hostnamectl set-hostname "$SERVER_HOSTNAME" 2>/dev/null \
+  || { echo "$SERVER_HOSTNAME" > /etc/hostname; hostname "$SERVER_HOSTNAME"; }
 # Mettre à jour /etc/hosts pour que le hostname se résolve localement
 if ! grep -q "127.0.1.1" /etc/hosts; then
     echo "127.0.1.1 $SERVER_HOSTNAME" >> /etc/hosts
