@@ -1,0 +1,14 @@
+# Géré par Ansible (rôle monitoring_stack) — ne pas éditer à la main.
+apiVersion: 1
+
+providers:
+  - name: "cia-{{ tier }}"
+    orgId: 1
+    folder: "CIA - {{ tier | upper }}"
+    type: file
+    disableDeletion: false
+    allowUiUpdates: false
+    updateIntervalSeconds: 30
+    options:
+      path: "{{ grafana_dashboards_dir | default('/var/lib/grafana/dashboards') }}/{{ tier }}"
+      foldersFromFilesStructure: false

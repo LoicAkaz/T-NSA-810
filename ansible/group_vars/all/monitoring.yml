@@ -42,3 +42,10 @@ alertmanager_slack_channel: "#alerts-infra"
 # --- Labels Promtail communs (optionnel) ---
 promtail_extra_labels:
   env: "production"
+
+# Tiers de dashboards à déployer. Pour onboarder Tier 2 / Tier 3 plus tard,
+# ajouter le dossier files/grafana/dashboards/tierN/ puis la ligne ici.
+grafana_dashboard_tiers:
+  - tier1
+  # - tier2
+  # - tier3
