@@ -1,0 +1,48 @@
+---
+# Provisioning des dashboards Grafana (Tier 1+) — projet CIA.
+#
+# À inclure depuis roles/monitoring_stack/tasks/main.yml, APRÈS l'installation
+# de Grafana et le provisioning des datasources :
+#
+#   - name: Provision Grafana dashboards (CIA)
+#     ansible.builtin.include_tasks: dashboards.yml
+#
+# Réutilise les variables déjà définies par ton rôle monitoring_stack.
+# Adapte les noms ci-dessous s'ils diffèrent dans ton rôle :
+#   - grafana_provisioning_dir   (défaut : /etc/grafana/provisioning)
+#   - grafana_dashboards_dir     (défaut : /var/lib/grafana/dashboards)
+#   - grafana_system_user/group  (défaut : grafana)
+# Et veille à ce que le nom du handler de restart corresponde au tien
+# (ici : "restart grafana").
+
+- name: Ensure Grafana dashboards directories exist
+  ansible.builtin.file:
+    path: "{{ grafana_dashboards_dir | default('/var/lib/grafana/dashboards') }}/{{ item }}"
+    state: directory
+    owner: "{{ grafana_system_user | default('grafana') }}"
+    group: "{{ grafana_system_group | default('grafana') }}"
+    mode: "0755"
+  loop: "{{ grafana_dashboard_tiers }}"
+
+- name: Provision Grafana dashboard providers (one per tier)
+  ansible.builtin.template:
+    src: grafana/dashboards-provider.yml.j2
+    dest: "{{ grafana_provisioning_dir | default('/etc/grafana/provisioning') }}/dashboards/cia-{{ item }}.yml"
+    owner: "{{ grafana_system_user | default('grafana') }}"
+    group: "{{ grafana_system_group | default('grafana') }}"
+    mode: "0640"
+  loop: "{{ grafana_dashboard_tiers }}"
+  vars:
+    tier: "{{ item }}"
+  notify: restart grafana
+
+- name: Deploy dashboard JSON models
+  ansible.builtin.copy:
+    src: "grafana/dashboards/{{ item }}/"
+    dest: "{{ grafana_dashboards_dir | default('/var/lib/grafana/dashboards') }}/{{ item }}/"
+    owner: "{{ grafana_system_user | default('grafana') }}"
+    group: "{{ grafana_system_group | default('grafana') }}"
+    mode: "0644"
+  loop: "{{ grafana_dashboard_tiers }}"
+  # Grafana recharge automatiquement les dashboards provisionnés (updateIntervalSeconds) :
+  # pas de restart nécessaire pour une simple mise à jour de JSON.
