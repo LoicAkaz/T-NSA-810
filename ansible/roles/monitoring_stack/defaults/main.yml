@@ -31,8 +31,9 @@ loki_config_dir: /etc/loki
 loki_data_dir: /var/lib/loki
 
 # --- Rétention Prometheus ---
-prometheus_retention_time: "30d"
-prometheus_retention_size: "10GB"
+prometheus_retention_time: "7d"
+prometheus_retention_size: "2GB"
+loki_retention_period: "168h"      # 7 jours
 
 # --- Scrape interval global ---
 prometheus_scrape_interval: "15s"
@@ -58,5 +59,3 @@ alertmanager_email_smarthost: "smtp.example.com:587"
 alertmanager_email_auth_username: ""       # à mettre en vault
 alertmanager_email_auth_password: ""       # à mettre en vault
 
-# --- Loki ---
-loki_retention_period: "744h"   # 31 jours
