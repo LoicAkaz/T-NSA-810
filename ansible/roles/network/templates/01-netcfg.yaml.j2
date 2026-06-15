@@ -1,0 +1,15 @@
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    {{ network_interface }}:
+      addresses:
+        - {{ ansible_host }}/{{ netmask_cidr }}
+      routes:
+        - to: default
+          via: {{ gateway }}
+      nameservers:
+        addresses:
+{% for dns in dns_servers %}
+          - {{ dns }}
+{% endfor %}
