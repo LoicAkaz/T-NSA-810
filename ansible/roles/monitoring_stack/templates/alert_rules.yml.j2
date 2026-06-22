@@ -77,7 +77,7 @@ groups:
           severity: warning
         annotations:
           summary: "ansible-pull obsolète sur {{ "{{ $labels.instance }}" }}"
-          description: 'Aucun ansible-pull réussi depuis plus de {{ "{{ printf \"%.0f\" (div $value 60) }}" }} min sur {{ "{{ $labels.instance }}" }} (cron attendu toutes les 15 min).'
+          description: 'Aucun ansible-pull réussi depuis {{ "{{ humanizeDuration $value }}" }} sur {{ "{{ $labels.instance }}" }} (cron attendu toutes les 15 min).'
 
       - alert: AnsiblePullStaleCritical
         expr: time() - ansible_pull_last_run_timestamp_seconds > 21600
