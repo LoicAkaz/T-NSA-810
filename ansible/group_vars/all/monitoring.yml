@@ -20,11 +20,11 @@ loki_push_url: "http://observability:3100/loki/api/v1/push"
 # --- Prometheus targets ---
 # Ajouter ici tout nouveau host à monitorer
 prometheus_node_exporter_targets:
-  - "bastion:9100"
-  - "applicatif:9100"
-  - "netbox:9100"
+  - "bastion.lan:9100"
+  - "applicatif.lan:9100"
+  - "netbox.lan:9100"
   - "observability:9100"
-  - "preprod:9100"
+  - "preprod.lan:9100"
 
 # --- Alertmanager receivers ---
 # Les credentials sont dans vault.yml (vault_alertmanager_*)
@@ -66,14 +66,14 @@ blackbox_icmp_targets:            # latence inter-site : passerelle LAN du site 
 blackbox_http_internal_targets:   # site web interne (sondé depuis le LAN)
   - "http://site.interne.cia.lan"
 blackbox_http_netbox_targets:     # IHM/API NetBox
-  - "http://netbox:8000/login/"
+  - "http://netbox.lan:8000/login/"
 blackbox_dns_targets:             # résolveurs des 2 sites (port 53)
   - "10.10.0.2:53"
   - "10.20.0.2:53"
 
 # --- postgres_exporter (tourne sur l'hôte BDD / NetBox) ---
 postgres_exporter_targets:
-  - "netbox:9187"
+  - "netbox.lan:9187"
 # DSN lecture seule vers la base netbox.
 # ⚠️ Le mot de passe doit venir de vault.yml (vault_pg_exporter_password), pas en clair.
 postgres_exporter_dsn: "postgresql://exporter:{{ vault_pg_exporter_password }}@localhost:5432/netbox?sslmode=disable"
