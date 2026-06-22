@@ -22,4 +22,3 @@
     name: chrony
     state: started
     enabled: true
-

@@ -10,7 +10,6 @@
 
   roles:
     - vault_ssh_ca
-    - network
 
     - role: system_baseline
 
