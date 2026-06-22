@@ -1,0 +1,53 @@
+---
+# Installe postgres_exporter SUR L'HÔTE qui héberge PostgreSQL (VM Administration / NetBox).
+# À jouer sur cet hôte (host_vars/netbox ou un play dédié), pas sur l'observability.
+# Le DSN doit pointer vers une instance/role en lecture sur la base 'netbox'.
+#   À inclure : - ansible.builtin.include_tasks: postgres_exporter.yml
+
+- name: postgres_exporter | create system user
+  ansible.builtin.user:
+    name: postgres_exporter
+    system: true
+    shell: /usr/sbin/nologin
+    create_home: false
+
+- name: postgres_exporter | download binary
+  ansible.builtin.get_url:
+    url: "https://github.com/prometheus-community/postgres_exporter/releases/download/v{{ postgres_exporter_version }}/postgres_exporter-{{ postgres_exporter_version }}.linux-amd64.tar.gz"
+    dest: "/tmp/pg_exporter-{{ postgres_exporter_version }}.tar.gz"
+    mode: "0644"
+
+- name: postgres_exporter | extract & install binary
+  ansible.builtin.unarchive:
+    src: "/tmp/pg_exporter-{{ postgres_exporter_version }}.tar.gz"
+    dest: /usr/local/bin
+    remote_src: true
+    extra_opts: ["--strip-components=1", "--wildcards", "*/postgres_exporter"]
+    creates: /usr/local/bin/postgres_exporter
+
+- name: postgres_exporter | deploy systemd unit
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/postgres_exporter.service
+    mode: "0644"
+    content: |
+      [Unit]
+      Description=Prometheus PostgreSQL Exporter
+      After=network-online.target
+
+      [Service]
+      User=postgres_exporter
+      Group=postgres_exporter
+      Environment=DATA_SOURCE_NAME={{ postgres_exporter_dsn }}
+      ExecStart=/usr/local/bin/postgres_exporter --web.listen-address=:9187
+      Restart=on-failure
+
+      [Install]
+      WantedBy=multi-user.target
+  notify: restart postgres_exporter
+
+- name: postgres_exporter | ensure service started and enabled
+  ansible.builtin.systemd:
+    name: postgres_exporter
+    state: started
+    enabled: true
+    daemon_reload: true
