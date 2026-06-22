@@ -1,3 +1,4 @@
 ---
-ansible_host: 10.0.41.100
+ansible_host: netbox.lan
+host_ip: 10.0.41.100
 gateway: 10.0.41.254

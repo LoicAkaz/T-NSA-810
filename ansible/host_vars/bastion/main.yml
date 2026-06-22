@@ -1,3 +1,4 @@
 ---
 ansible_host: 10.0.41.100
+host_ip: 10.0.41.100
 gateway: 10.0.41.254

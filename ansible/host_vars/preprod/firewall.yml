@@ -11,23 +11,23 @@ host_firewall_in_rules:
     comment: "Allow HTTPS traffic"
   - port: "9100"
     proto: tcp
-    from_ip: "{{ hostvars['observability']['ansible_host'] }}"
+    from_ip: "{{ hostvars['observability']['host_ip'] }}"
     comment: "Prometheus scrape node_exporter"
   - port: "3100"
     proto: tcp
-    from_ip: "{{ hostvars['bastion']['ansible_host'] }}"
+    from_ip: "{{ hostvars['bastion']['host_ip'] }}"
     comment: "Promtail push — bastion"
   - port: "3100"
     proto: tcp
-    from_ip: "{{ hostvars['applicatif']['ansible_host'] }}"
+    from_ip: "{{ hostvars['applicatif']['host_ip'] }}"
     comment: "Promtail push — applicatif"
   - port: "3100"
     proto: tcp
-    from_ip: "{{ hostvars['netbox']['ansible_host'] }}"
+    from_ip: "{{ hostvars['netbox']['host_ip'] }}"
     comment: "Promtail push — netbox"
   - port: "3100"
     proto: tcp
-    from_ip: "{{ hostvars['preprod']['ansible_host'] }}"
+    from_ip: "{{ hostvars['preprod']['host_ip'] }}"
     comment: "Promtail push — preprod"
 
   # Stack centrale (accès depuis ton réseau d'admin uniquement)

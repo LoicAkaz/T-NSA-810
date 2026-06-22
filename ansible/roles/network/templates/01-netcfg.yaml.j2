@@ -4,7 +4,7 @@ network:
   ethernets:
     {{ network_interface }}:
       addresses:
-        - {{ ansible_host }}/{{ netmask_cidr }}
+        - {{ host_ip }}/{{ netmask_cidr }}
       routes:
         - to: default
           via: {{ gateway }}

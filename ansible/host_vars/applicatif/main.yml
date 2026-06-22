@@ -1,3 +1,4 @@
 ---
-ansible_host: 192.168.41.101
+ansible_host: applicatif.lan
+host_ip: 192.168.41.101
 gateway: 192.168.41.254

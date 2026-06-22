@@ -11,5 +11,5 @@ host_firewall_in_rules:
     comment: "Allow HTTPS traffic"
   - port: "9100"
     proto: tcp
-    from_ip: "{{ hostvars['observability']['ansible_host'] }}"
+    from_ip: "{{ hostvars['observability']['host_ip'] }}"
     comment: "Prometheus scrape node_exporter"
