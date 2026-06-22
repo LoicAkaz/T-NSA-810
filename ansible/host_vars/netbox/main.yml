@@ -1,3 +1,3 @@
 ---
-ansible_host: 10.0.1.12
-gateway: 192.168.41.254
+ansible_host: 10.0.41.100
+gateway: 10.0.41.254
