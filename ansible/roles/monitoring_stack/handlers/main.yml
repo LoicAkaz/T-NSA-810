@@ -31,3 +31,10 @@
     url: "http://localhost:{{ prometheus_port }}/-/reload"
     method: POST
     status_code: 200
+
+# ---- AJOUT CIA ----
+- name: restart blackbox_exporter
+  ansible.builtin.systemd:
+    name: blackbox_exporter
+    state: restarted
+    daemon_reload: true

@@ -20,3 +20,12 @@
 - name: "monitoring_stack | import grafana tasks"
   ansible.builtin.import_tasks: grafana.yml
   tags: [monitoring, grafana]
+
+# ---- AJOUT CIA : blackbox_exporter + dashboards Grafana (après grafana) ----
+- name: "monitoring_stack | import blackbox tasks"
+  ansible.builtin.import_tasks: blackbox.yml
+  tags: [monitoring, blackbox]
+
+- name: "monitoring_stack | import grafana dashboards tasks"
+  ansible.builtin.import_tasks: dashboards.yml
+  tags: [monitoring, grafana, dashboards]
