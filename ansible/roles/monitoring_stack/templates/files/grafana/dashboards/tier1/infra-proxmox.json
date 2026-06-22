@@ -1,10 +1,10 @@
 {
   "uid": "cia-proxmox-infra",
-  "title": "CIA · Infrastructure Proxmox & VMs",
+  "title": "CIA · Infrastructure Linux Nodes",
   "tags": [
     "cia",
     "tier1",
-    "proxmox",
+    "node_exporter",
     "infra"
   ],
   "timezone": "browser",
@@ -27,13 +27,13 @@
           "uid": "prometheus"
         },
         "query": {
-          "query": "label_values(pve_up, instance)",
+          "query": "label_values(up{job=\"node_exporter\"}, instance)",
           "refId": "StandardVariableQuery"
         },
         "refresh": 2,
         "includeAll": true,
         "multi": true,
-        "label": "PVE endpoint",
+        "label": "Node endpoint",
         "current": {
           "selected": true,
           "text": [
@@ -66,8 +66,8 @@
     {
       "id": 1,
       "type": "stat",
-      "title": "Noeuds Proxmox UP",
-      "description": "pve_up filtre sur les noeuds (id=node/...).",
+      "title": "Node Exporters UP",
+      "description": "Nombre d'instances node_exporter UP.",
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"
@@ -121,9 +121,9 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "sum(pve_up{id=~\"node/.*\", instance=~\"$instance\"})",
+          "expr": "sum(up{job=\"node_exporter\", instance=~\"$instance\"})",
           "refId": "A",
-          "legendFormat": "nodes",
+          "legendFormat": "up",
           "editorMode": "code"
         }
       ]
@@ -131,8 +131,8 @@
     {
       "id": 2,
       "type": "stat",
-      "title": "VMs en cours d'execution",
-      "description": "VMs QEMU dont pve_up == 1.",
+      "title": "CPU moyen (5m)",
+      "description": "Utilisation CPU moyenne de toutes les instances node_exporter.",
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"
@@ -182,9 +182,9 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "count(pve_up{id=~\"qemu/.*\", instance=~\"$instance\"} == 1)",
+          "expr": "100 * (1 - avg(rate(node_cpu_seconds_total{mode=\"idle\", instance=~\"$instance\"}[5m])))",
           "refId": "A",
-          "legendFormat": "running",
+          "legendFormat": "cpu_avg",
           "editorMode": "code"
         }
       ]
@@ -192,7 +192,7 @@
     {
       "id": 3,
       "type": "stat",
-      "title": "CPU max noeud",
+      "title": "RAM max utilisee",
       "description": "",
       "datasource": {
         "type": "prometheus",
@@ -251,9 +251,9 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "max(pve_cpu_usage_ratio{id=~\"node/.*\", instance=~\"$instance\"})",
+          "expr": "max(1 - (node_memory_MemAvailable_bytes{instance=~\"$instance\"} / node_memory_MemTotal_bytes{instance=~\"$instance\"}))",
           "refId": "A",
-          "legendFormat": "cpu",
+          "legendFormat": "ram",
           "editorMode": "code"
         }
       ]
@@ -261,7 +261,7 @@
     {
       "id": 4,
       "type": "stat",
-      "title": "RAM max noeud",
+      "title": "Disque / max utilise",
       "description": "",
       "datasource": {
         "type": "prometheus",
@@ -320,9 +320,9 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "max(pve_memory_usage_bytes{id=~\"node/.*\", instance=~\"$instance\"} / pve_memory_size_bytes{id=~\"node/.*\", instance=~\"$instance\"})",
+          "expr": "max((node_filesystem_size_bytes{mountpoint=\"/\", fstype!~\"tmpfs|overlay\", instance=~\"$instance\"} - node_filesystem_avail_bytes{mountpoint=\"/\", fstype!~\"tmpfs|overlay\", instance=~\"$instance\"}) / node_filesystem_size_bytes{mountpoint=\"/\", fstype!~\"tmpfs|overlay\", instance=~\"$instance\"})",
           "refId": "A",
-          "legendFormat": "ram",
+          "legendFormat": "rootfs",
           "editorMode": "code"
         }
       ]
@@ -330,8 +330,8 @@
     {
       "id": 5,
       "type": "timeseries",
-      "title": "CPU par noeud",
-      "description": "Charge CPU de chaque hyperviseur Proxmox.",
+      "title": "CPU par instance",
+      "description": "Utilisation CPU par instance node_exporter.",
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"
@@ -389,9 +389,9 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "pve_cpu_usage_ratio{id=~\"node/.*\", instance=~\"$instance\"}",
+          "expr": "100 * (1 - avg by (instance) (rate(node_cpu_seconds_total{mode=\"idle\", instance=~\"$instance\"}[5m])))",
           "refId": "A",
-          "legendFormat": "{{id}}",
+          "legendFormat": "{{instance}}",
           "editorMode": "code"
         }
       ]
@@ -399,8 +399,8 @@
     {
       "id": 6,
       "type": "timeseries",
-      "title": "Memoire par noeud",
-      "description": "Taux d'occupation memoire par noeud.",
+      "title": "Memoire par instance",
+      "description": "Taux d'occupation memoire par instance.",
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"
@@ -458,9 +458,9 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "pve_memory_usage_bytes{id=~\"node/.*\", instance=~\"$instance\"} / pve_memory_size_bytes{id=~\"node/.*\", instance=~\"$instance\"}",
+          "expr": "1 - (node_memory_MemAvailable_bytes{instance=~\"$instance\"} / node_memory_MemTotal_bytes{instance=~\"$instance\"})",
           "refId": "A",
-          "legendFormat": "{{id}}",
+          "legendFormat": "{{instance}}",
           "editorMode": "code"
         }
       ]
@@ -468,8 +468,8 @@
     {
       "id": 7,
       "type": "timeseries",
-      "title": "Occupation du stockage",
-      "description": "Remplissage des datastores (local, local-lvm, ...).",
+      "title": "Occupation disque racine",
+      "description": "Occupation du filesystem racine par instance.",
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"
@@ -527,9 +527,9 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "pve_disk_usage_bytes{id=~\"storage/.*\", instance=~\"$instance\"} / pve_disk_size_bytes{id=~\"storage/.*\", instance=~\"$instance\"}",
+          "expr": "(node_filesystem_size_bytes{mountpoint=\"/\", fstype!~\"tmpfs|overlay\", instance=~\"$instance\"} - node_filesystem_avail_bytes{mountpoint=\"/\", fstype!~\"tmpfs|overlay\", instance=~\"$instance\"}) / node_filesystem_size_bytes{mountpoint=\"/\", fstype!~\"tmpfs|overlay\", instance=~\"$instance\"}",
           "refId": "A",
-          "legendFormat": "{{id}}",
+          "legendFormat": "{{instance}}",
           "editorMode": "code"
         }
       ]
@@ -537,8 +537,8 @@
     {
       "id": 8,
       "type": "table",
-      "title": "Inventaire des VMs",
-      "description": "Etat (1=running) + nom + noeud de chaque VM, via pve_guest_info.",
+      "title": "Inventaire des instances",
+      "description": "Etat up + informations systeme publiees par node_uname_info.",
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"
@@ -588,7 +588,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "pve_up{id=~\"qemu/.*\", instance=~\"$instance\"} * on(id, instance) group_left(name, node) pve_guest_info{instance=~\"$instance\"}",
+          "expr": "up{job=\"node_exporter\", instance=~\"$instance\"} * on(instance) group_left(nodename, sysname, release, machine) node_uname_info{instance=~\"$instance\"}",
           "refId": "A",
           "legendFormat": "",
           "editorMode": "code",
