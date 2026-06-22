@@ -1,0 +1,19 @@
+---
+- name: Déployer la configuration Netplan
+  ansible.builtin.template:
+    src: 01-netcfg.yaml.j2
+    dest: /etc/netplan/01-netcfg.yaml
+    owner: root
+    group: root
+    mode: '0600'
+  register: netplan_config
+
+- name: Valider la configuration Netplan
+  ansible.builtin.command: netplan generate
+  when: netplan_config.changed
+  changed_when: false
+
+- name: Appliquer la configuration Netplan
+  ansible.builtin.command: netplan apply
+  when: netplan_config.changed
+  changed_when: true

@@ -1,0 +1,5 @@
+---
+network_interface: "ens18"
+netmask_cidr: 24
+dns_servers:
+  - "8.8.8.8"

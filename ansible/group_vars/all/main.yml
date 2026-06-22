@@ -15,7 +15,12 @@ ssh_login_grace_time: 30
 ssh_client_alive_interval: 300
 ssh_client_alive_count_max: 2
 ssh_allowed_users:
-  - ubuntu
   - admin
   - root
   - deploy
+
+network_interface: "enp6s18"
+netmask_cidr: 24
+dns_servers:
+  - "192.168.41.254"
+  - "8.8.8.8"

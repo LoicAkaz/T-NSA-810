@@ -1,0 +1,9 @@
+---
+# Clé publique CA de Vault — à remplacer par la vraie valeur
+vault_ca_public_key: "ssh-rsa AAAA... vault-ca"
+
+# Chemin où sera stockée la clé CA sur la machine
+vault_ca_cert_path: "/etc/ssh/vault_ca.pub"
+
+# Utilisateur autorisé à se connecter (principal)
+ssh_allowed_principal: "ec2-user"

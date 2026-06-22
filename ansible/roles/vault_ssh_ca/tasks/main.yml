@@ -1,0 +1,48 @@
+---
+# roles/vault_ssh_ca/tasks/main.yml
+# Configure la machine pour faire confiance à la CA SSH de Vault
+
+- name: Déployer la clé publique CA de Vault
+  ansible.builtin.copy:
+    content: "{{ vault_ca_public_key }}\n"
+    dest: "{{ vault_ca_cert_path }}"
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Configurer sshd pour faire confiance à la CA Vault
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^TrustedUserCAKeys'
+    line: "TrustedUserCAKeys {{ vault_ca_cert_path }}"
+    state: present
+    backup: true
+  notify: Restart sshd
+
+- name: Activer AuthorizedPrincipalsFile
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^AuthorizedPrincipalsFile'
+    line: "AuthorizedPrincipalsFile /etc/ssh/auth_principals/%u"
+    state: present
+  notify: Restart sshd
+
+- name: Créer le dossier des principals
+  ansible.builtin.file:
+    path: /etc/ssh/auth_principals
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Définir le principal autorisé pour l'utilisateur
+  ansible.builtin.copy:
+    content: "{{ ssh_allowed_principal }}\n"
+    dest: "/etc/ssh/auth_principals/{{ ssh_allowed_principal }}"
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Vérifier que la config sshd est valide
+  ansible.builtin.command: sshd -t
+  changed_when: false
