@@ -38,7 +38,7 @@
 
 - name: Deploy dashboard JSON models
   ansible.builtin.copy:
-    src: "grafana/dashboards/{{ item }}/"
+    src: "templates/files/grafana/dashboards/{{ item }}/"
     dest: "{{ grafana_dashboards_dir | default('/var/lib/grafana/dashboards') }}/{{ item }}/"
     owner: "{{ grafana_system_user | default('grafana') }}"
     group: "{{ grafana_system_group | default('grafana') }}"
