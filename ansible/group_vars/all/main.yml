@@ -24,3 +24,7 @@ netmask_cidr: 24
 dns_servers:
   - "192.168.41.254"
   - "8.8.8.8"
+
+# --- Admin network CIDR pour les règles firewall (accès aux UIs) ---
+# À adapter selon ton réseau d'administration
+admin_network_cidr: "192.168.41.0/24"
