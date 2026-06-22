@@ -91,3 +91,39 @@ scrape_configs:
     pipeline_stages:
       - drop:
           expression: ".*health.*check.*"
+
+{% if inventory_hostname == 'observability' %}
+  # ===========================================================================
+  # ---- AJOUT CIA : récepteur syslog pfSense (uniquement sur observability) ----
+  # pfSense n'exécute pas promtail : il envoie son syslog firewall ici.
+  # pfSense > Status > System Logs > Settings > Remote Logging :
+  #   Remote log servers : {{ inventory_hostname }}:1514 (UDP)
+  #   Remote Syslog Contents : Firewall events
+  # Alimente les panneaux "paquets bloqués / top IP" du dashboard pfSense.
+  # ===========================================================================
+  - job_name: "pfsense"
+    syslog:
+      listen_address: 0.0.0.0:1514
+      listen_protocol: udp
+      idle_timeout: 60s
+      label_structured_data: false
+      labels:
+        job: pfsense
+    relabel_configs:
+      - source_labels: [__syslog_message_hostname]
+        target_label: host
+    pipeline_stages:
+      - match:
+          selector: '{job="pfsense"} |= "filterlog"'
+          stages:
+            # filterlog CSV (IPv4) : extraction action / src_ip / dst_port / interface.
+            # Les positions des champs peuvent varier selon ta version pfSense :
+            # si les panneaux "blocages" restent vides, ajuster cette regex.
+            - regex:
+                expression: '(?P<rulenum>\d+),(?P<subrule>[^,]*),(?P<anchor>[^,]*),(?P<tracker>[^,]*),(?P<iface>[^,]*),(?P<reason>[^,]*),(?P<action>pass|block),(?P<dir>[^,]*),(?P<ipver>[^,]*),.*?,(?P<proto_name>[^,]*),.*?,(?P<src_ip>\d+\.\d+\.\d+\.\d+),(?P<dst_ip>\d+\.\d+\.\d+\.\d+),(?P<src_port>\d+),(?P<dst_port>\d+)'
+            - labels:
+                action:
+                src_ip:
+                dst_port:
+                iface:
+{% endif %}

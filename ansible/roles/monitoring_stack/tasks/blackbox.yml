@@ -1,0 +1,74 @@
+---
+# Installe blackbox_exporter (sondes ICMP / HTTP / DNS).
+# Sert : latence inter-site VPN (Tier 1), dispo site interne + NetBox + DNS forwarding (Tier 2).
+# À inclure depuis monitoring_stack/tasks/main.yml :
+#   - ansible.builtin.include_tasks: blackbox.yml
+
+- name: blackbox | create system user
+  ansible.builtin.user:
+    name: blackbox
+    system: true
+    shell: /usr/sbin/nologin
+    create_home: false
+
+- name: blackbox | create config directory
+  ansible.builtin.file:
+    path: /etc/blackbox_exporter
+    state: directory
+    owner: blackbox
+    group: blackbox
+    mode: "0755"
+
+- name: blackbox | download binary
+  ansible.builtin.get_url:
+    url: "https://github.com/prometheus/blackbox_exporter/releases/download/v{{ blackbox_version }}/blackbox_exporter-{{ blackbox_version }}.linux-amd64.tar.gz"
+    dest: "/tmp/blackbox-{{ blackbox_version }}.tar.gz"
+    mode: "0644"
+
+- name: blackbox | extract & install binary
+  ansible.builtin.unarchive:
+    src: "/tmp/blackbox-{{ blackbox_version }}.tar.gz"
+    dest: /usr/local/bin
+    remote_src: true
+    extra_opts: ["--strip-components=1", "--wildcards", "*/blackbox_exporter"]
+    creates: /usr/local/bin/blackbox_exporter
+
+- name: blackbox | deploy config
+  ansible.builtin.template:
+    src: blackbox/blackbox.yml.j2
+    dest: /etc/blackbox_exporter/blackbox.yml
+    owner: blackbox
+    group: blackbox
+    mode: "0644"
+  notify: restart blackbox_exporter
+
+- name: blackbox | deploy systemd unit
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/blackbox_exporter.service
+    mode: "0644"
+    content: |
+      [Unit]
+      Description=Prometheus Blackbox Exporter
+      After=network-online.target
+      Wants=network-online.target
+
+      [Service]
+      User=blackbox
+      Group=blackbox
+      # AmbientCapabilities nécessaire pour les sondes ICMP sans root
+      AmbientCapabilities=CAP_NET_RAW
+      ExecStart=/usr/local/bin/blackbox_exporter \
+        --config.file=/etc/blackbox_exporter/blackbox.yml \
+        --web.listen-address=:9115
+      Restart=on-failure
+
+      [Install]
+      WantedBy=multi-user.target
+  notify: restart blackbox_exporter
+
+- name: blackbox | ensure service started and enabled
+  ansible.builtin.systemd:
+    name: blackbox_exporter
+    state: started
+    enabled: true
+    daemon_reload: true

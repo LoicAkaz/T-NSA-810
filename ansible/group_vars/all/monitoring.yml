@@ -43,9 +43,37 @@ alertmanager_slack_channel: "#alerts-infra"
 promtail_extra_labels:
   env: "production"
 
-# Tiers de dashboards à déployer. Pour onboarder Tier 2 / Tier 3 plus tard,
-# ajouter le dossier files/grafana/dashboards/tierN/ puis la ligne ici.
+# Tiers de dashboards à déployer.
 grafana_dashboard_tiers:
   - tier1
-  # - tier2
-  # - tier3
+  - tier2
+
+# =============================================================================
+# ---- AJOUT CIA : dashboards Tier 1/2, blackbox & postgres_exporter ----
+# =============================================================================
+
+# --- Versions des nouveaux exporters ---
+blackbox_version: "0.25.0"
+postgres_exporter_version: "0.15.0"
+
+# --- blackbox_exporter (tourne sur observability) ---
+blackbox_address: "127.0.0.1:9115"           # utilisé dans le relabel Prometheus
+blackbox_dns_query_name: "host.interne.cia.lan"   # ⚠️ zone interne réelle à tester
+
+# Cibles des sondes — ⚠️ REMPLACER par tes vraies IP/URL :
+blackbox_icmp_targets:            # latence inter-site : passerelle LAN du site distant
+  - "10.20.0.1"
+blackbox_http_internal_targets:   # site web interne (sondé depuis le LAN)
+  - "http://site.interne.cia.lan"
+blackbox_http_netbox_targets:     # IHM/API NetBox
+  - "http://netbox:8000/login/"
+blackbox_dns_targets:             # résolveurs des 2 sites (port 53)
+  - "10.10.0.2:53"
+  - "10.20.0.2:53"
+
+# --- postgres_exporter (tourne sur l'hôte BDD / NetBox) ---
+postgres_exporter_targets:
+  - "netbox:9187"
+# DSN lecture seule vers la base netbox.
+# ⚠️ Le mot de passe doit venir de vault.yml (vault_pg_exporter_password), pas en clair.
+postgres_exporter_dsn: "postgresql://exporter:{{ vault_pg_exporter_password }}@localhost:5432/netbox?sslmode=disable"

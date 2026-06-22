@@ -1,0 +1,26 @@
+# Géré par Ansible (monitoring_stack). Modules de sonde blackbox.
+modules:
+  icmp:
+    prober: icmp
+    timeout: 5s
+    icmp:
+      preferred_ip_protocol: ip4
+
+  http_2xx:
+    prober: http
+    timeout: 5s
+    http:
+      method: GET
+      preferred_ip_protocol: ip4
+      valid_status_codes: []          # 2xx par défaut
+      fail_if_not_ssl: false
+      fail_if_ssl: false
+
+  dns_udp:
+    prober: dns
+    timeout: 5s
+    dns:
+      transport_protocol: udp
+      preferred_ip_protocol: ip4
+      query_name: "{{ blackbox_dns_query_name }}"
+      query_type: A
