@@ -4,8 +4,8 @@
 
 [server]
 http_port = {{ grafana_port }}
-domain = {{ ansible_fqdn | default(ansible_hostname) }}
-root_url = http://{{ ansible_fqdn | default(ansible_hostname) }}:{{ grafana_port }}/
+domain = {{ ansible_fqdn | default(ansible_host) }}
+root_url = http://{{ ansible_fqdn | default(ansible_host) }}:{{ grafana_port }}/
 
 [security]
 admin_user = admin
