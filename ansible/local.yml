@@ -27,6 +27,11 @@
     - role: promtail
       tags: [monitoring, promtail]
 
+    # PostgreSQL exporter - activé explicitement par hôte
+    - role: postgres_exporter
+      when: postgres_exporter_enabled | default(false)
+      tags: [monitoring, postgres_exporter]
+
     # Stack centrale - uniquement le serveur observability
     - role: monitoring_stack
       when: "'cap_monitoring_central' in group_names"

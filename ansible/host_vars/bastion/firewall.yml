@@ -13,3 +13,7 @@ host_firewall_in_rules:
     proto: tcp
     from_ip: "{{ hostvars['observability']['host_ip'] }}"
     comment: "Prometheus scrape node_exporter"
+  - port: "9187"
+    proto: tcp
+    from_ip: "{{ hostvars['observability']['host_ip'] }}"
+    comment: "Prometheus scrape postgres_exporter"

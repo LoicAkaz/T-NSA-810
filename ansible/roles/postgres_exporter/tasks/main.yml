@@ -1,0 +1,78 @@
+---
+- name: "postgres_exporter | validate required variables"
+  ansible.builtin.assert:
+    that:
+      - postgres_exporter_dsn is defined
+      - postgres_exporter_dsn | length > 0
+    fail_msg: "postgres_exporter_dsn est requis (idéalement via Vault)."
+
+- name: "postgres_exporter | create system user"
+  ansible.builtin.user:
+    name: "{{ postgres_exporter_user }}"
+    system: true
+    shell: /usr/sbin/nologin
+    create_home: false
+
+- name: "postgres_exporter | check installed version"
+  ansible.builtin.command: "{{ postgres_exporter_binary_path }} --version"
+  register: postgres_exporter_installed_version
+  changed_when: false
+  failed_when: false
+
+- name: "postgres_exporter | download binary archive"
+  ansible.builtin.get_url:
+    url: "https://github.com/prometheus-community/postgres_exporter/releases/download/v{{ postgres_exporter_version }}/postgres_exporter-{{ postgres_exporter_version }}.linux-amd64.tar.gz"
+    dest: "/tmp/postgres_exporter-{{ postgres_exporter_version }}.tar.gz"
+    mode: "0644"
+  when: >
+    postgres_exporter_installed_version.rc != 0 or
+    postgres_exporter_version not in (postgres_exporter_installed_version.stdout ~ postgres_exporter_installed_version.stderr)
+
+- name: "postgres_exporter | extract binary archive"
+  ansible.builtin.unarchive:
+    src: "/tmp/postgres_exporter-{{ postgres_exporter_version }}.tar.gz"
+    dest: /tmp
+    remote_src: true
+  when: >
+    postgres_exporter_installed_version.rc != 0 or
+    postgres_exporter_version not in (postgres_exporter_installed_version.stdout ~ postgres_exporter_installed_version.stderr)
+
+- name: "postgres_exporter | install binary"
+  ansible.builtin.copy:
+    src: "/tmp/postgres_exporter-{{ postgres_exporter_version }}.linux-amd64/postgres_exporter"
+    dest: "{{ postgres_exporter_binary_path }}"
+    remote_src: true
+    owner: root
+    group: root
+    mode: "0755"
+  notify: restart postgres_exporter
+  when: >
+    postgres_exporter_installed_version.rc != 0 or
+    postgres_exporter_version not in (postgres_exporter_installed_version.stdout ~ postgres_exporter_installed_version.stderr)
+
+- name: "postgres_exporter | deploy environment file"
+  ansible.builtin.copy:
+    dest: "{{ postgres_exporter_env_file }}"
+    content: |
+      DATA_SOURCE_NAME={{ postgres_exporter_dsn }}
+    owner: root
+    group: root
+    mode: "0600"
+  notify: restart postgres_exporter
+  no_log: true
+
+- name: "postgres_exporter | deploy systemd unit"
+  ansible.builtin.template:
+    src: postgres_exporter.service.j2
+    dest: /etc/systemd/system/postgres_exporter.service
+    owner: root
+    group: root
+    mode: "0644"
+  notify: restart postgres_exporter
+
+- name: "postgres_exporter | ensure service started and enabled"
+  ansible.builtin.systemd:
+    name: postgres_exporter
+    state: started
+    enabled: true
+    daemon_reload: true

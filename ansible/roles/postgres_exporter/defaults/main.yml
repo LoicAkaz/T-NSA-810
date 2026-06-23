@@ -1,0 +1,13 @@
+---
+# Activation explicite par hôte (évite un déploiement involontaire partout)
+postgres_exporter_enabled: false
+
+postgres_exporter_version: "0.15.0"
+postgres_exporter_user: postgres_exporter
+postgres_exporter_group: postgres_exporter
+postgres_exporter_port: 9187
+postgres_exporter_binary_path: /usr/local/bin/postgres_exporter
+postgres_exporter_env_file: /etc/default/postgres_exporter
+
+# Doit venir d'un vault (voir group_vars/all/monitoring.yml)
+postgres_exporter_dsn: ""

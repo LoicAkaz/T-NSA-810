@@ -2,3 +2,6 @@
 ansible_host: 10.0.41.100
 host_ip: 10.0.41.100
 gateway: 10.0.41.254
+
+# NetBox/PostgreSQL sont co-localisés sur ce serveur.
+postgres_exporter_enabled: true

@@ -72,7 +72,7 @@ blackbox_dns_targets:             # résolveurs des 2 sites (port 53)
 
 # --- postgres_exporter (tourne sur l'hôte BDD / NetBox) ---
 postgres_exporter_targets:
-  - "netbox.lan:9187"
+  - "bastion.lan:9187"
 # DSN lecture seule vers la base netbox.
 # Le mot de passe doit venir de vault.yml (vault_pg_exporter_password), pas en clair.
 postgres_exporter_dsn: "postgresql://exporter:{{ vault_pg_exporter_password }}@localhost:5432/netbox?sslmode=disable"
