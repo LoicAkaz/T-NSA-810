@@ -38,7 +38,7 @@ alertmanager_email_auth_password: "{{ vault_alertmanager_email_password }}"
 
 alertmanager_slack_enabled: true
 alertmanager_slack_webhook_url: "{{ vault_alertmanager_slack_webhook_url }}"
-alertmanager_slack_channel: "#alerts-infra"
+alertmanager_slack_channel: "#alerts-critical_1"
 
 # --- Labels Promtail communs (optionnel) ---
 promtail_extra_labels:
