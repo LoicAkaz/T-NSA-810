@@ -90,7 +90,7 @@
             "type": "loki",
             "uid": "loki"
           },
-          "expr": "sum(count_over_time({host=\"netbox\"} [1h]))",
+          "expr": "sum(count_over_time({host=~\"netbox|bastion\"} [1h]))",
           "refId": "A",
           "legendFormat": "",
           "editorMode": "code",
@@ -161,7 +161,7 @@
             "type": "loki",
             "uid": "loki"
           },
-          "expr": "sum(count_over_time({host=\"netbox\"} |~ `(?i)error|fail|critical|panic|fatal` [1h]))",
+          "expr": "sum(count_over_time({host=~\"netbox|bastion\"} |~ `(?i)error|fail|critical|panic|fatal` [1h]))",
           "refId": "A",
           "legendFormat": "",
           "editorMode": "code",
@@ -228,7 +228,7 @@
             "type": "loki",
             "uid": "loki"
           },
-          "expr": "sum(count_over_time({job=\"systemd-journal\", host=\"netbox\"} |~ `(?i)failed to start|entered failed state` [1h]))",
+          "expr": "sum(count_over_time({job=\"systemd-journal\", host=~\"netbox|bastion\"} |~ `(?i)failed to start|entered failed state` [1h]))",
           "refId": "A",
           "legendFormat": "",
           "editorMode": "code",
@@ -299,7 +299,7 @@
             "type": "loki",
             "uid": "loki"
           },
-          "expr": "sum(count_over_time({host=\"netbox\"} |~ `(?i)FATAL|PANIC|deadlock|could not` [1h]))",
+          "expr": "sum(count_over_time({host=~\"netbox|bastion\"} |~ `(?i)FATAL|PANIC|deadlock|could not` [1h]))",
           "refId": "A",
           "legendFormat": "",
           "editorMode": "code",
@@ -371,7 +371,7 @@
             "type": "loki",
             "uid": "loki"
           },
-          "expr": "sum by (level) (count_over_time({job=\"systemd-journal\", host=\"netbox\"} [$__interval]))",
+          "expr": "sum by (level) (count_over_time({job=\"systemd-journal\", host=~\"netbox|bastion\"} [$__interval]))",
           "refId": "A",
           "legendFormat": "{{level}}",
           "editorMode": "code",
@@ -441,7 +441,7 @@
             "type": "loki",
             "uid": "loki"
           },
-          "expr": "sum(count_over_time({host=\"netbox\"} |~ `(?i)error|fail|critical|panic|fatal` [$__interval]))",
+          "expr": "sum(count_over_time({host=~\"netbox|bastion\"} |~ `(?i)error|fail|critical|panic|fatal` [$__interval]))",
           "refId": "A",
           "legendFormat": "erreurs",
           "editorMode": "code",
@@ -502,7 +502,7 @@
             "type": "loki",
             "uid": "loki"
           },
-          "expr": "topk(10, sum by (unit) (count_over_time({job=\"systemd-journal\", host=\"netbox\"} [1h])))",
+          "expr": "topk(10, sum by (unit) (count_over_time({job=\"systemd-journal\", host=~\"netbox|bastion\"} [1h])))",
           "refId": "A",
           "legendFormat": "",
           "editorMode": "code",
@@ -543,7 +543,7 @@
             "type": "loki",
             "uid": "loki"
           },
-          "expr": "{job=\"systemd-journal\", host=\"netbox\", level=~`err|crit|alert|emerg`}",
+          "expr": "{job=\"systemd-journal\", host=~\"netbox|bastion\", level=~`err|crit|alert|emerg`}",
           "refId": "A",
           "legendFormat": "",
           "editorMode": "code",
@@ -582,7 +582,7 @@
             "type": "loki",
             "uid": "loki"
           },
-          "expr": "{job=\"systemd-journal\", host=\"netbox\", unit=~`netbox.*|postgresql.*`}",
+          "expr": "{job=\"systemd-journal\", host=~\"netbox|bastion\", unit=~`netbox.*|postgresql.*`}",
           "refId": "A",
           "legendFormat": "",
           "editorMode": "code",
