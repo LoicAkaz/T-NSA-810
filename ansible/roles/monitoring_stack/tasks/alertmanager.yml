@@ -68,6 +68,7 @@
     owner: "{{ alertmanager_user }}"
     group: "{{ alertmanager_user }}"
     mode: "0640"
+    validate: "/usr/local/bin/amtool check-config %s"
   notify: restart alertmanager
 
 - name: "alertmanager | deploy systemd unit"
