@@ -98,7 +98,7 @@
             "type": "loki",
             "uid": "loki"
           },
-          "expr": "sum(count_over_time({job=\"bastion\"} |= \"Failed password\" [24h]))",
+          "expr": "sum(count_over_time({job=\"auth\",host=\"bastion\"} |= \"Failed password\" [24h]))",
           "refId": "A",
           "legendFormat": "failed",
           "editorMode": "code",
@@ -160,7 +160,7 @@
             "type": "loki",
             "uid": "loki"
           },
-          "expr": "sum(count_over_time({job=\"bastion\"} |= \"Accepted\" [24h]))",
+          "expr": "sum(count_over_time({job=\"auth\",host=\"bastion\"} |= \"Accepted\" [24h]))",
           "refId": "A",
           "legendFormat": "ok",
           "editorMode": "code",
@@ -226,7 +226,7 @@
             "type": "loki",
             "uid": "loki"
           },
-          "expr": "sum(count_over_time({job=\"bastion\"} |= \"sudo:\" |= \"COMMAND=\" [24h]))",
+          "expr": "sum(count_over_time({job=\"auth\",host=\"bastion\"} |= \"sudo:\" |= \"COMMAND=\" [24h]))",
           "refId": "A",
           "legendFormat": "sudo",
           "editorMode": "code",
@@ -296,7 +296,7 @@
             "type": "loki",
             "uid": "loki"
           },
-          "expr": "count(sum by (ip) (count_over_time({job=\"bastion\"} |= \"Failed password\" | pattern `<_>from <ip> port<_>` [1h])))",
+          "expr": "count(sum by (ip) (count_over_time({job=\"auth\",host=\"bastion\"} |= \"Failed password\" | pattern `<_>from <ip> port<_>` [1h])))",
           "refId": "A",
           "legendFormat": "ips",
           "editorMode": "code",
@@ -365,7 +365,7 @@
             "type": "loki",
             "uid": "loki"
           },
-          "expr": "sum(count_over_time({job=\"bastion\"} |= \"Accepted\" [$__interval]))",
+          "expr": "sum(count_over_time({job=\"auth\",host=\"bastion\"} |= \"Accepted\" [$__interval]))",
           "refId": "A",
           "legendFormat": "reussies",
           "editorMode": "code",
@@ -376,7 +376,7 @@
             "type": "loki",
             "uid": "loki"
           },
-          "expr": "sum(count_over_time({job=\"bastion\"} |= \"Failed password\" [$__interval]))",
+          "expr": "sum(count_over_time({job=\"auth\",host=\"bastion\"} |= \"Failed password\" [$__interval]))",
           "refId": "B",
           "legendFormat": "echouees",
           "editorMode": "code",
@@ -438,7 +438,7 @@
             "type": "loki",
             "uid": "loki"
           },
-          "expr": "topk(10, sum by (ip) (count_over_time({job=\"bastion\"} |= \"Failed password\" | pattern `<_>from <ip> port<_>` [1h])))",
+          "expr": "topk(10, sum by (ip) (count_over_time({job=\"auth\",host=\"bastion\"} |= \"Failed password\" | pattern `<_>from <ip> port<_>` [1h])))",
           "refId": "A",
           "legendFormat": "",
           "editorMode": "code",
@@ -502,7 +502,7 @@
             "type": "loki",
             "uid": "loki"
           },
-          "expr": "topk(10, sum by (user) (count_over_time({job=\"bastion\"} |= \"Failed password\" | pattern `<_>for <user> from<_>` [1h])))",
+          "expr": "topk(10, sum by (user) (count_over_time({job=\"auth\",host=\"bastion\"} |= \"Failed password\" | pattern `<_>for <user> from<_>` [1h])))",
           "refId": "A",
           "legendFormat": "",
           "editorMode": "code",
@@ -573,7 +573,7 @@
             "type": "loki",
             "uid": "loki"
           },
-          "expr": "sum(count_over_time({job=\"bastion\"} |= \"sudo:\" |= \"COMMAND=\" [$__interval]))",
+          "expr": "sum(count_over_time({job=\"auth\",host=\"bastion\"} |= \"sudo:\" |= \"COMMAND=\" [$__interval]))",
           "refId": "A",
           "legendFormat": "sudo",
           "editorMode": "code",
@@ -612,7 +612,7 @@
             "type": "loki",
             "uid": "loki"
           },
-          "expr": "{job=\"bastion\"} |~ `Failed password|Accepted|sudo:|session opened|session closed`",
+          "expr": "{job=\"auth\",host=\"bastion\"} |~ `Failed password|Accepted|sudo:|session opened|session closed`",
           "refId": "A",
           "legendFormat": "",
           "editorMode": "code",
