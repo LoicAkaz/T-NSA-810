@@ -7,5 +7,7 @@
 
 # vault_alertmanager_email_username: "your-smtp-user"
 # vault_alertmanager_email_password: "your-smtp-password"
-# vault_alertmanager_slack_webhook_url: "https://hooks.slack.com/services/T.../B.../..."
+# Discord : URL du webhook Discord avec "/slack" ajouté à la fin
+# (Alertmanager utilise l'intégration Slack, l'endpoint /slack de Discord est compatible)
+# vault_alertmanager_slack_webhook_url: "https://discord.com/api/webhooks/<id>/<token>/slack"
 # vault_grafana_admin_password: "your-grafana-admin-password"
