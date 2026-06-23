@@ -9,7 +9,7 @@ promtail_user: promtail
 promtail_port: 9080   # port HTTP interne de promtail (métriques)
 
 # Adresse du serveur Loki central
-loki_push_url: "http://observability:3100/loki/api/v1/push"
+loki_push_url: "http://monitoring.lan:3100/loki/api/v1/push"
 
 # Répertoire de positions (curseurs de lecture des fichiers de log)
 promtail_positions_dir: /var/lib/promtail

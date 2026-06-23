@@ -14,8 +14,8 @@ node_exporter_version: "1.8.1"
 promtail_version: "3.0.0"
 
 # --- Adresse Loki pour tous les agents Promtail ---
-# "observability" doit être résolvable depuis tous les hosts (DNS interne ou /etc/hosts)
-loki_push_url: "http://observability:3100/loki/api/v1/push"
+# "monitoring.lan" doit être résolvable depuis tous les hosts (DNS interne ou /etc/hosts)
+loki_push_url: "http://monitoring.lan:3100/loki/api/v1/push"
 
 # --- Prometheus targets ---
 # Ajouter ici tout nouveau host à monitorer
@@ -23,7 +23,7 @@ prometheus_node_exporter_targets:
   - "bastion.lan:9100"
   - "applicatif.lan:9100"
   - "netbox.lan:9100"
-  - "observability:9100"
+  - "monitoring.lan:9100"
 
 # --- Alertmanager receivers ---
 # Les credentials sont dans vault.yml (vault_alertmanager_*)

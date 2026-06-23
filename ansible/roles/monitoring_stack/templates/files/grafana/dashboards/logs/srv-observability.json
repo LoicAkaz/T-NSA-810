@@ -1,6 +1,6 @@
 {
   "uid": "cia-logs-srv-obs",
-  "title": "CIA · Logs — Serveur Observability (stack monitoring)",
+  "title": "CIA · Logs — Serveur monitoring.lan (stack monitoring)",
   "tags": [
     "cia",
     "logs",
@@ -89,7 +89,7 @@
             "type": "loki",
             "uid": "loki"
           },
-          "expr": "sum(count_over_time({host=\"observability\"} [1h]))",
+          "expr": "sum(count_over_time({host=\"monitoring.lan\"} [1h]))",
           "refId": "A",
           "legendFormat": "",
           "editorMode": "code",
@@ -160,7 +160,7 @@
             "type": "loki",
             "uid": "loki"
           },
-          "expr": "sum(count_over_time({host=\"observability\"} |~ `(?i)error|fail|critical|panic|fatal` [1h]))",
+          "expr": "sum(count_over_time({host=\"monitoring.lan\"} |~ `(?i)error|fail|critical|panic|fatal` [1h]))",
           "refId": "A",
           "legendFormat": "",
           "editorMode": "code",
@@ -227,7 +227,7 @@
             "type": "loki",
             "uid": "loki"
           },
-          "expr": "sum(count_over_time({job=\"systemd-journal\", host=\"observability\"} |~ `(?i)failed to start|entered failed state` [1h]))",
+          "expr": "sum(count_over_time({job=\"systemd-journal\", host=\"monitoring.lan\"} |~ `(?i)failed to start|entered failed state` [1h]))",
           "refId": "A",
           "legendFormat": "",
           "editorMode": "code",
@@ -298,7 +298,7 @@
             "type": "loki",
             "uid": "loki"
           },
-          "expr": "sum(count_over_time({job=\"systemd-journal\", host=\"observability\", unit=~`prometheus.service|loki.service|grafana-server.service|alertmanager.service`} |~ `(?i)level=error|error|failed` [1h]))",
+          "expr": "sum(count_over_time({job=\"systemd-journal\", host=\"monitoring.lan\", unit=~`prometheus.service|loki.service|grafana-server.service|alertmanager.service`} |~ `(?i)level=error|error|failed` [1h]))",
           "refId": "A",
           "legendFormat": "",
           "editorMode": "code",
@@ -370,7 +370,7 @@
             "type": "loki",
             "uid": "loki"
           },
-          "expr": "sum by (level) (count_over_time({job=\"systemd-journal\", host=\"observability\"} [$__interval]))",
+          "expr": "sum by (level) (count_over_time({job=\"systemd-journal\", host=\"monitoring.lan\"} [$__interval]))",
           "refId": "A",
           "legendFormat": "{{level}}",
           "editorMode": "code",
@@ -440,7 +440,7 @@
             "type": "loki",
             "uid": "loki"
           },
-          "expr": "sum(count_over_time({host=\"observability\"} |~ `(?i)error|fail|critical|panic|fatal` [$__interval]))",
+          "expr": "sum(count_over_time({host=\"monitoring.lan\"} |~ `(?i)error|fail|critical|panic|fatal` [$__interval]))",
           "refId": "A",
           "legendFormat": "erreurs",
           "editorMode": "code",
@@ -501,7 +501,7 @@
             "type": "loki",
             "uid": "loki"
           },
-          "expr": "topk(10, sum by (unit) (count_over_time({job=\"systemd-journal\", host=\"observability\"} [1h])))",
+          "expr": "topk(10, sum by (unit) (count_over_time({job=\"systemd-journal\", host=\"monitoring.lan\"} [1h])))",
           "refId": "A",
           "legendFormat": "",
           "editorMode": "code",
@@ -542,7 +542,7 @@
             "type": "loki",
             "uid": "loki"
           },
-          "expr": "{job=\"systemd-journal\", host=\"observability\", level=~`err|crit|alert|emerg`}",
+          "expr": "{job=\"systemd-journal\", host=\"monitoring.lan\", level=~`err|crit|alert|emerg`}",
           "refId": "A",
           "legendFormat": "",
           "editorMode": "code",
@@ -581,7 +581,7 @@
             "type": "loki",
             "uid": "loki"
           },
-          "expr": "{job=\"systemd-journal\", host=\"observability\", unit=~`prometheus.service|loki.service|grafana-server.service|alertmanager.service`}",
+          "expr": "{job=\"systemd-journal\", host=\"monitoring.lan\", unit=~`prometheus.service|loki.service|grafana-server.service|alertmanager.service`}",
           "refId": "A",
           "legendFormat": "",
           "editorMode": "code",
