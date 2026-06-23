@@ -15,9 +15,28 @@ ssh_login_grace_time: 30
 ssh_client_alive_interval: 300
 ssh_client_alive_count_max: 2
 ssh_allowed_users:
+  - ubuntu
   - admin
   - root
   - deploy
+
+ssh_users:
+  - name: admin
+    groups: [sudo]
+    sudo_nopasswd: true
+    authorized_keys:
+      - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDK5yKom5N1qa3OHB0ccWKBJWcdLOHH/sb4RQmylyDFTfDyzlLRj3hAJpMLZ7k/jtYd5gNNBYifEvL5LgaQIuYLK5Gtpx5J6KMpiSXT88UomirvtP+w+PTz18A55/7qi5w77EA5NBPDqLErdHIT39xzz4Oj+tFktgU9z+Dvjz5wCCyVqWq/uTtNTQdrG6YEAnyIOu15VfV8x2nwVgxrsjrDaVrEGAKNYwjHc2grRPGcs/zzEC38SQ5E4bSYPRYaFE/hw7R8Qf+LAhuqTIyfC8IVfbnKYMRmxf00QDkOeZkVqvt4NZW2T4/XIcxH5aRdPDk9RXIueZJk3tp9GYrtcJHkLY4JoU5f58KwPcotMRGzXIwJjS2wFlG+quXR2As41RseTxh0E2U9H3YfEY2cIJMQovHWYNlSyNYVh0QwTkNZtDhpWRNDipda73cUoB5xMWyBPVH6LtVP25vfBaQpkNvrNQJYVeSEvF9CGRorEkBfJfZft5KLNJ9XCmmKgbuLYPM= aderemi mvlik@LAPTOP-I1TNHV7L"
+      - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFLidbX0QTOX7HahiiXpEroqdG4pVwpVIHwgDjT8lQX3 akazongloic@gmail.com"
+      - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHrzaV7359/FQ7t4lYBxbskp0ie08Fy21ILL62eVA+PQ github-actions"
+      - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOJlpGUIE/qOP/kaZvianiHSMtwRcdwmoPAKnruSfzko bastion"
+
+  - name: deploy
+    groups: [sudo]
+    authorized_keys:
+      - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDK5yKom5N1qa3OHB0ccWKBJWcdLOHH/sb4RQmylyDFTfDyzlLRj3hAJpMLZ7k/jtYd5gNNBYifEvL5LgaQIuYLK5Gtpx5J6KMpiSXT88UomirvtP+w+PTz18A55/7qi5w77EA5NBPDqLErdHIT39xzz4Oj+tFktgU9z+Dvjz5wCCyVqWq/uTtNTQdrG6YEAnyIOu15VfV8x2nwVgxrsjrDaVrEGAKNYwjHc2grRPGcs/zzEC38SQ5E4bSYPRYaFE/hw7R8Qf+LAhuqTIyfC8IVfbnKYMRmxf00QDkOeZkVqvt4NZW2T4/XIcxH5aRdPDk9RXIueZJk3tp9GYrtcJHkLY4JoU5f58KwPcotMRGzXIwJjS2wFlG+quXR2As41RseTxh0E2U9H3YfEY2cIJMQovHWYNlSyNYVh0QwTkNZtDhpWRNDipda73cUoB5xMWyBPVH6LtVP25vfBaQpkNvrNQJYVeSEvF9CGRorEkBfJfZft5KLNJ9XCmmKgbuLYPM= aderemi mvlik@LAPTOP-I1TNHV7L"
+      - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFLidbX0QTOX7HahiiXpEroqdG4pVwpVIHwgDjT8lQX3 akazongloic@gmail.com"
+      - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHrzaV7359/FQ7t4lYBxbskp0ie08Fy21ILL62eVA+PQ github-actions"
+      - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOJlpGUIE/qOP/kaZvianiHSMtwRcdwmoPAKnruSfzko bastion"
 
 network_interface: "enp6s18"
 netmask_cidr: 24

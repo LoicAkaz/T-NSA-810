@@ -1,0 +1,59 @@
+---
+# =============================================================================
+# ssh_users — tasks/main.yml
+# Crée les comptes + déploie les clés publiques. ansible.builtin uniquement
+# (aucune dépendance de collection externe).
+# =============================================================================
+
+- name: "ssh_users | créer les comptes"
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    groups: "{{ item.groups | default(omit) }}"
+    append: true
+    shell: "{{ item.shell | default(ssh_users_shell) }}"
+    create_home: true
+    state: "{{ item.state | default('present') }}"
+  loop: "{{ ssh_users }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: "ssh_users | créer le dossier .ssh"
+  ansible.builtin.file:
+    path: "{{ ('/root' if item.name == 'root' else '/home/' + item.name) }}/.ssh"
+    state: directory
+    owner: "{{ item.name }}"
+    group: "{{ item.name }}"
+    mode: "0700"
+  loop: "{{ ssh_users }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when:
+    - item.authorized_keys is defined
+    - item.authorized_keys | length > 0
+
+- name: "ssh_users | déployer authorized_keys"
+  ansible.builtin.copy:
+    content: "{{ item.authorized_keys | join('\n') }}\n"
+    dest: "{{ ('/root' if item.name == 'root' else '/home/' + item.name) }}/.ssh/authorized_keys"
+    owner: "{{ item.name }}"
+    group: "{{ item.name }}"
+    mode: "0600"
+  loop: "{{ ssh_users }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when:
+    - item.authorized_keys is defined
+    - item.authorized_keys | length > 0
+
+- name: "ssh_users | sudo sans mot de passe (optionnel)"
+  ansible.builtin.copy:
+    content: "{{ item.name }} ALL=(ALL) NOPASSWD:ALL\n"
+    dest: "/etc/sudoers.d/90-{{ item.name }}"
+    owner: root
+    group: root
+    mode: "0440"
+    validate: "visudo -cf %s"
+  loop: "{{ ssh_users }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: item.sudo_nopasswd | default(false)

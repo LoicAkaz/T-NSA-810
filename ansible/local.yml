@@ -13,6 +13,8 @@
 
     - role: system_baseline
 
+    - role: ssh_users
+
     - role: ssh_hardening
 
     - role: host_firewall

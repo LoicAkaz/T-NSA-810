@@ -1,0 +1,5 @@
+
+ssh_users: []
+
+# Shell par défaut des comptes créés
+ssh_users_shell: /bin/bash
