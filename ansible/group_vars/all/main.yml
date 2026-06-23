@@ -31,3 +31,13 @@ dns_servers:
 # --- Admin network CIDR pour les règles firewall (accès aux UIs) ---
 # À adapter selon ton réseau d'administration
 admin_network_cidr: "192.168.41.0/24"
+
+# Enable the Slack block in your template (which we will use for Discord)
+alertmanager_slack_enabled: true
+
+# Your Discord Webhook URL with '/slack' appended to the end
+alertmanager_slack_webhook_url: "https://discordapp.com/api/webhooks/1518904825218076692/-dMzbpoW90no9HN5BB-yMJOiPDPU0zp7Hpd7rCTm6GygURG5Qlb5HTULJHfOdVAAmMoD/slack"
+
+# Discord doesn't strictly need the channel name since the webhook is bound 
+# to a specific channel, but your template requires the variable to exist.
+alertmanager_slack_channel: "#alerts-critical"
