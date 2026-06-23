@@ -27,7 +27,9 @@ prometheus_node_exporter_targets:
 
 # --- Alertmanager receivers ---
 # Les credentials sont dans vault.yml (vault_alertmanager_*)
-alertmanager_email_enabled: true
+# Email désactivé : seul Discord est utilisé pour l'alerting.
+# Pour le réactiver : passer à true ET renseigner un vrai smarthost/from/to ci-dessous.
+alertmanager_email_enabled: false
 alertmanager_email_from: "alertmanager@example.com"
 alertmanager_email_to: "ops@example.com"
 alertmanager_email_smarthost: "smtp.example.com:587"
