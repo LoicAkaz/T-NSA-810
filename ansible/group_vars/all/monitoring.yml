@@ -58,9 +58,9 @@ postgres_exporter_version: "0.15.0"
 
 # --- blackbox_exporter (tourne sur observability) ---
 blackbox_address: "127.0.0.1:9115"           # utilisé dans le relabel Prometheus
-blackbox_dns_query_name: "host.interne.cia.lan"   # ⚠️ zone interne réelle à tester
+blackbox_dns_query_name: "host.interne.cia.lan"   # zone interne réelle à tester
 
-# Cibles des sondes — ⚠️ REMPLACER par tes vraies IP/URL :
+# Cibles des sondes — REMPLACER par tes vraies IP/URL :
 blackbox_icmp_targets:            # latence inter-site : passerelle LAN du site distant
   - "10.20.0.1"
 blackbox_http_internal_targets:   # site web interne (sondé depuis le LAN)
@@ -75,5 +75,5 @@ blackbox_dns_targets:             # résolveurs des 2 sites (port 53)
 postgres_exporter_targets:
   - "netbox.lan:9187"
 # DSN lecture seule vers la base netbox.
-# ⚠️ Le mot de passe doit venir de vault.yml (vault_pg_exporter_password), pas en clair.
+# Le mot de passe doit venir de vault.yml (vault_pg_exporter_password), pas en clair.
 postgres_exporter_dsn: "postgresql://exporter:{{ vault_pg_exporter_password }}@localhost:5432/netbox?sslmode=disable"
