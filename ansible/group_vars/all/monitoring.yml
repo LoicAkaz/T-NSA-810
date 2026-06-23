@@ -46,6 +46,7 @@ promtail_extra_labels:
 grafana_dashboard_tiers:
   - tier1
   - tier2
+  - logs
 
 # =============================================================================
 # ---- AJOUT CIA : dashboards Tier 1/2, blackbox & postgres_exporter ----
