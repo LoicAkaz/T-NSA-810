@@ -24,7 +24,6 @@ prometheus_node_exporter_targets:
   - "applicatif.lan:9100"
   - "netbox.lan:9100"
   - "observability:9100"
-  - "preprod.lan:9100"
 
 # --- Alertmanager receivers ---
 # Les credentials sont dans vault.yml (vault_alertmanager_*)
