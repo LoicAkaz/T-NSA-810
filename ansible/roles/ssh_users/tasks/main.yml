@@ -17,12 +17,27 @@
   loop_control:
     label: "{{ item.name }}"
 
+- name: "ssh_users | récupérer le groupe primaire"
+  ansible.builtin.command: "id -gn {{ item.name }}"
+  changed_when: false
+  loop: "{{ ssh_users }}"
+  loop_control:
+    label: "{{ item.name }}"
+  register: ssh_users_primary_groups_raw
+
+- name: "ssh_users | construire la map des groupes primaires"
+  ansible.builtin.set_fact:
+    ssh_users_primary_groups: "{{ ssh_users_primary_groups | default({}) | combine({item.item.name: item.stdout}) }}"
+  loop: "{{ ssh_users_primary_groups_raw.results }}"
+  loop_control:
+    label: "{{ item.item.name }}"
+
 - name: "ssh_users | créer le dossier .ssh"
   ansible.builtin.file:
     path: "{{ ('/root' if item.name == 'root' else '/home/' + item.name) }}/.ssh"
     state: directory
     owner: "{{ item.name }}"
-    group: "{{ item.name }}"
+    group: "{{ item.group | default(ssh_users_primary_groups[item.name] | default(item.name)) }}"
     mode: "0700"
   loop: "{{ ssh_users }}"
   loop_control:
@@ -36,7 +51,7 @@
     content: "{{ item.authorized_keys | join('\n') }}\n"
     dest: "{{ ('/root' if item.name == 'root' else '/home/' + item.name) }}/.ssh/authorized_keys"
     owner: "{{ item.name }}"
-    group: "{{ item.name }}"
+    group: "{{ item.group | default(ssh_users_primary_groups[item.name] | default(item.name)) }}"
     mode: "0600"
   loop: "{{ ssh_users }}"
   loop_control:
