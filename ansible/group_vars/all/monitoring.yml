@@ -70,7 +70,7 @@ blackbox_http_internal_targets:   # site web interne (sondé depuis le LAN)
 blackbox_http_netbox_targets:     # IHM/API NetBox
   - "http://netbox.lan:8000/login/"
 blackbox_dns_targets:             # résolveurs DNS internes
-  - "10.0.1.14:53"
+  - "192.168.41.254:53"
 
 # --- postgres_exporter (tourne sur l'hôte BDD / NetBox) ---
 postgres_exporter_targets:

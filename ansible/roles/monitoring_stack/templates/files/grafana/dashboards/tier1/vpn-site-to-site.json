@@ -498,7 +498,7 @@
       "id": 7,
       "type": "logs",
       "title": "Evenements OpenVPN (connexions / coupures)",
-      "description": "Logs OpenVPN : negociation TLS, connexion/deconnexion des pairs, timeouts.",
+      "description": "Logs journald OpenVPN sur bastion : negociation TLS, connexion/deconnexion des pairs, timeouts.",
       "datasource": {
         "type": "loki",
         "uid": "loki"
@@ -525,7 +525,7 @@
             "type": "loki",
             "uid": "loki"
           },
-          "expr": "{job=\"openvpn\"} |~ `(?i)peer connection|TLS|reconnect|disconnect|inactivity`",
+          "expr": "{job=\"systemd-journal\", host=\"bastion\", unit=~`openvpn.*`} |~ `(?i)peer connection|TLS|reconnect|disconnect|inactivity|initialization sequence completed`",
           "refId": "A",
           "legendFormat": "",
           "editorMode": "code",

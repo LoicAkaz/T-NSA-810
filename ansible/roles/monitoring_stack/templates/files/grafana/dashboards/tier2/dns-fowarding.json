@@ -479,8 +479,8 @@
     {
       "id": 7,
       "type": "logs",
-      "title": "Journal du résolveur (optionnel)",
-      "description": "Si promtail collecte les logs du service DNS sous le label job=dns.",
+      "title": "Journal DNS (optionnel)",
+      "description": "Logs journald liés au DNS (named/unbound/dnsmasq) si présents sur les hôtes collectés.",
       "datasource": {
         "type": "loki",
         "uid": "loki"
@@ -505,7 +505,7 @@
             "type": "loki",
             "uid": "loki"
           },
-          "expr": "{job=\"dns\"} |~ `(?i)query|forward|refused|SERVFAIL|NXDOMAIN`",
+          "expr": "{job=\"systemd-journal\", host=~\"bastion|netbox|observability\"} |~ `(?i)named|unbound|dnsmasq|query|forward|refused|SERVFAIL|NXDOMAIN`",
           "refId": "A",
           "legendFormat": "",
           "editorMode": "code",
