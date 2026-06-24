@@ -60,17 +60,17 @@ postgres_exporter_version: "0.15.0"
 
 # --- blackbox_exporter (tourne sur observability) ---
 blackbox_address: "127.0.0.1:9115"           # utilisé dans le relabel Prometheus
-blackbox_dns_query_name: "host.interne.cia.lan"   # zone interne réelle à tester
+blackbox_dns_query_name: "bastion.lan"
 
 # Cibles des sondes — REMPLACER par tes vraies IP/URL :
 blackbox_icmp_targets:            # latence inter-site : passerelle LAN du site distant
   - "10.20.0.1"
 blackbox_http_internal_targets:   # site web interne (sondé depuis le LAN)
-  - "http://site.interne.cia.lan"
+  - "http://applicatif.lan"
 blackbox_http_netbox_targets:     # IHM/API NetBox
   - "http://netbox.lan:8000/login/"
-blackbox_dns_targets:             # résolveurs des 2 sites (port 53)
-  - "192.168.41.254:53"
+blackbox_dns_targets:             # résolveurs DNS internes
+  - "10.0.1.14:53"
 
 # --- postgres_exporter (tourne sur l'hôte BDD / NetBox) ---
 postgres_exporter_targets:
